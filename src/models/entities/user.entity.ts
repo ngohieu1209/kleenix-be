@@ -1,29 +1,31 @@
-import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
+import { Column, Entity, OneToMany, Unique } from 'typeorm';
 import { BaseEntity } from './base.entity';
-import { Exclude } from 'class-transformer';
-import { RoleEntity } from './role.entity';
+import { AddressEntity } from './address.entity';
 
 @Entity({
   name: 'user',
 })
 export class UserEntity extends BaseEntity {
-  @Column({ unique: true })
-  email: string;
-
-  @Column()
-  @Exclude({ toPlainOnly: true })
+  @Column({ select: false })
   password: string;
   
   @Column()
   name: string;
   
-  @Column({
-    nullable: true
-  })
-  avatar: string;
+  @Column({ name: 'phone_code' })
+  phoneCode: string;
   
-  @ManyToOne(() => RoleEntity, (role) => role.user, {
-    eager: true
+  @Column({ name: 'phone_number' })
+  phoneNumber: string;
+  
+  @Column({
+    default: false
   })
-  role: RoleEntity
+  verify: boolean;
+  
+  // RELATION
+  // -----------------------------------------------------------------------------
+  
+  @OneToMany(() => AddressEntity, (address) => address.user)
+  address: AddressEntity[];
 }

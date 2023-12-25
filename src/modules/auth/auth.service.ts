@@ -20,10 +20,8 @@ import type {
 } from './dto/register.dto';
 import {
   UserRepository,
-  RoleRepository,
-  StudentRepository,
 } from 'src/models/repositories';
-import { RoleEntity, StudentEntity, UserEntity } from 'src/models/entities';
+import { UserEntity } from 'src/models/entities';
 import { DatabaseUtilService } from 'src/shared/services/database-util.service';
 import { DataSource } from 'typeorm';
 
@@ -33,8 +31,6 @@ export class AuthService {
 
   constructor(
     private readonly userRepository: UserRepository,
-    private readonly roleRepository: RoleRepository,
-    private readonly studentRepository: StudentRepository,
     private readonly databaseUtilService: DatabaseUtilService,
     private readonly dataSource: DataSource,
     private readonly jwtService: JwtService,
@@ -50,45 +46,30 @@ export class AuthService {
   generateAccessToken(payload: JwtPayload): string {
     return this.jwtService.sign(payload, {
       expiresIn: this.configService.get('auth.accessExpires', { infer: true }),
-      secret: this.configService.get('auth.accessSecret', { infer: true }),
     });
   }
 
   generateRefreshToken(payload: JwtPayload): string {
     return this.jwtService.sign(payload, {
       expiresIn: this.configService.get('auth.refreshExpires', { infer: true }),
-      secret: this.configService.get('auth.refreshSecret', { infer: true }),
     });
   }
 
-  async login(loginRequestDto: LoginRequestDto): Promise<LoginResponseDto> {
-    const user = await this.userRepository.findOne({
-      where: {
-        email: loginRequestDto.email,
-      },
-    });
-
-    if (!user) {
-      throw new BaseException(ERROR.USER_NOT_EXIST);
-    }
-
-    const match = await compare(loginRequestDto.password, user.password);
-
+  async login(loginRequest: LoginRequestDto): Promise<LoginResponseDto> {
+    const { phoneCode, phoneNumber, password } = loginRequest;
+    const user = await this.userRepository.getUserWithPassword(phoneCode, phoneNumber);
+    
+    const match = await compare(password, user.password);
+        
     if (!match) {
-      throw new BaseException(ERROR.WRONG_EMAIL_OR_PASSWORD);
+      throw new BaseException(ERROR.WRONG_PHONE_OR_PASSWORD);
     }
 
-    const accessToken = this.generateAccessToken({
-      userId: user.id,
-      role: user.role.id,
-    });
+    const accessToken = this.generateAccessToken({ userId: user.id });
 
     const signatureAccessToken = accessToken.split('.')[2];
 
-    const refreshToken = this.generateRefreshToken({
-      userId: user.id,
-      role: user.role.id,
-    });
+    const refreshToken = this.generateRefreshToken({ userId: user.id });
 
     const signatureRefreshToken = refreshToken.split('.')[2];
 
@@ -104,51 +85,33 @@ export class AuthService {
     };
   }
 
-  async registerStudent(
-    registerRequestDto: RegisterRequestDto
-    // ): Promise<RegisterResponseDto> {
-  ): Promise<any> {
-    const checkUserExist = await this.userRepository.isUserExist(
-      registerRequestDto.email
-    );
+  async register( registerRequest: RegisterRequestDto): Promise<RegisterResponseDto> {
+    const { phoneCode, phoneNumber, name, password } = registerRequest;
+    const checkUserExist = await this.userRepository.isUserExist(phoneCode, phoneNumber);
     if (checkUserExist) {
       throw new BaseException(ERROR.USER_EXISTED);
     }
 
     const hashPassword = await hash(
-      registerRequestDto.password,
+      password,
       COMMON_CONSTANT.BCRYPT_SALT_ROUND
     );
-
-    const role = await this.roleRepository.getRoleId(Role.Student);
-    const result = await this.databaseUtilService.executeTransaction(
-      this.dataSource,
-      async (queryRunner) => {
-        const userRepository = queryRunner.manager.getRepository(UserEntity)
-        const studentRepository = queryRunner.manager.getRepository(StudentEntity)
-        
-        const generateUser = await userRepository.save(
-          plainToClass(UserEntity, {
-            email: registerRequestDto.email,
-            password: hashPassword,
-            name: registerRequestDto.name,
-            role,
-          })
-        );
-        await studentRepository.save(
-          plainToClass(StudentEntity, {
-            ...registerRequestDto.student,
-            user: generateUser.id,
-          })
-        );
-        return generateUser;
+    
+    const newUser = new UserEntity();
+    newUser.phoneCode = phoneCode;
+    newUser.phoneNumber = phoneNumber;
+    newUser.name = name;
+    newUser.password = hashPassword;
+    try {
+      const result = await this.userRepository.save(newUser);
+      return {
+        id: result.id,
+        phoneCode: result.phoneCode,
+        phoneNumber: result.phoneNumber
       }
-    );
-
-    return {
-      id: result.id,
-      email: result.email,
-    };
+    } catch (error) {
+      throw new BaseException(ERROR.REGISTER_FAIL);
+    }
   }
 
   async logout(accessToken: string, userId: number): Promise<boolean> {
@@ -179,9 +142,7 @@ export class AuthService {
     let payload: JwtPayload;
 
     try {
-      payload = await this.jwtService.verifyAsync(refreshToken, {
-        secret: this.configService.get('auth.refreshSecret', { infer: true }),
-      });
+      payload = await this.jwtService.verifyAsync(refreshToken)
     } catch (error) {
       if (error.name === 'TokenExpiredError') {
         payload = this.jwtService.decode(refreshToken) as JwtPayload;
@@ -208,15 +169,9 @@ export class AuthService {
       throw new BaseException(ERROR.REFRESH_TOKEN_FAIL);
     }
 
-    const newAccessToken = this.generateAccessToken({
-      userId: payload.userId,
-      role: payload.role,
-    });
+    const newAccessToken = this.generateAccessToken({ userId: payload.userId });
 
-    const newRefreshToken = this.generateRefreshToken({
-      userId: payload.userId,
-      role: payload.role,
-    });
+    const newRefreshToken = this.generateRefreshToken({ userId: payload.userId });
 
     const newSignatureAccessToken = newAccessToken.split('.')[2];
     const newSignatureRefreshToken = newRefreshToken.split('.')[2];

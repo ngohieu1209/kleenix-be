@@ -9,9 +9,9 @@ export type AppConfig = {
 };
 
 export type AuthConfig = {
-  accessSecret?: string;
+  publicKey?: string;
+  privateKey?: string;
   accessExpires?: string;
-  refreshSecret?: string;
   refreshExpires?: string;
 };
 

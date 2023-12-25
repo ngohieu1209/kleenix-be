@@ -1,20 +1,11 @@
 import { Global, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { COMMON_CONSTANT } from 'src/shared/constants/common.constant';
-import { RoleEntity, StudentEntity, UserEntity } from './entities';
-import { RoleRepository, StudentRepository, UserRepository } from './repositories';
+import * as Entities from './entities';
+import * as Repositories from './repositories';
 
-const CommonEntities = [
-  RoleEntity,
-  UserEntity,
-  StudentEntity
-];
+const CommonEntities = Object.values(Entities);
 
-const CommonRepositories = [
-  RoleRepository,
-  UserRepository,
-  StudentRepository
-];
+const CommonRepositories = Object.values(Repositories);
 
 @Global()
 @Module({

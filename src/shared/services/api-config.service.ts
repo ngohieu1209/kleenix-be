@@ -33,9 +33,10 @@ export class ApiConfigService {
 
   getJwtConfig(): JwtModuleOptions {
     return {
-      secret:  this.configService.get('auth.accessSecret', { infer: true }),
+      publicKey:  this.configService.get('auth.publicKey', { infer: true }),
+      privateKey: this.configService.get('auth.privateKey', { infer: true }),
       signOptions: {
-        expiresIn:  this.configService.get('auth.accessExpires', { infer: true }),
+        algorithm: 'RS256',
       },
     };
   }

@@ -15,7 +15,7 @@ services:
 
   postgres:
     image: postgres:15
-    container_name: zen-postgres
+    container_name: kleenix-postgres
     environment:
       POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
       POSTGRES_DB: ${DATABASE_NAME}
@@ -25,24 +25,24 @@ services:
     ports:
       - ${DATABASE_PORT}:5432
     volumes:
-      - postgres-data:/var/lib/postgres/data
+      - postgres-kleenix:/var/lib/postgres/data
     networks:
-      - zen_net
+      - kleenix_net
 
   redis:
     image: 'redis:6-alpine'
-    container_name: zen-redis
+    container_name: kleenix-redis
     ports:
       - 6379:6379
     volumes:
-      - redis-data:/var/lib/redis/data
+      - redis-kleenix:/var/lib/redis/data
     networks:
-      - zen_net
+      - kleenix_net
 
 volumes:
-  postgres-data:
-  redis-data:
+  postgres-kleenix:
+  redis-kleenix:
   
 networks:
-  zen_net:
+  kleenix_net:
     driver: bridge

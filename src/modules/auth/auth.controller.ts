@@ -55,7 +55,7 @@ export class AuthController {
   async registerStudent(
     @Body() registerRequestDto: RegisterRequestDto,
   ): Promise<RegisterResponseDto> {
-    return this.authService.registerStudent(registerRequestDto);
+    return this.authService.register(registerRequestDto);
   }
 
   @ApiOperation({
