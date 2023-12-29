@@ -5,6 +5,7 @@ import { JwtDecodedData } from 'src/shared/decorators/auth.decorator';
 import { UserAccountService } from './account.service';
 import { JwtPayload } from 'src/modules/auth/dto/jwt-payload.dto';
 import { UserEntity } from 'src/models/entities';
+import { UpdateUserDto } from './dto/update-user.dto';
 
 @Controller('user')
 @ApiTags('User | Account')
@@ -22,22 +23,14 @@ export class UserAccountController {
     return this.userAccountService.getMe(data.userId);
   }
 
-  // @ApiOperation({
-  //   summary: 'Cập nhật thông tin học sinh',
-  // })
-  // @ApiConsumes('multipart/form-data')
-  // @Patch('information')
-  // @UseInterceptors(FileInterceptor('avatar'))
-  // async updateInformationStudent(
-  //   @Body() updateInformationStudent: UpdateInformationStudentDto,
-  //   @JwtDecodedData() data: JwtPayload,
-  //   @UploadedFile(
-  //     new ParseFilePipe({
-  //       validators: [new ImageFileValidator({})],
-  //       fileIsRequired: false
-  //     }),
-  //   ) avatar?: Express.Multer.File,
-  // ): Promise<any> {
-  //   return this.studentAccountService.updateInformationStudent(data.userId, updateInformationStudent, avatar);
-  // }
+  @ApiOperation({
+    summary: 'update information user',
+  })
+  @Patch('edit')
+  async updateInformationStudent(
+    @Body() updateUser: UpdateUserDto,
+    @JwtDecodedData() data: JwtPayload,
+  ): Promise<string> {
+    return this.userAccountService.updateInformation(data.userId, updateUser);
+  }
 }

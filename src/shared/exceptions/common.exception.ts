@@ -26,5 +26,9 @@ export const commonHttpErrors = {
   REGISTER_FAIL: {
     message: 'Đăng kí thất bại',
     code: "ERROR_00006",
+  },
+  UPDATE_FAIL: {
+    message: 'Cập nhật thất bại',
+    code: 'ERROR_00007'
   }
 };

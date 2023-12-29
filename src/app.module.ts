@@ -25,8 +25,10 @@ import fileConfig from './shared/configs/file.config';
 import redisConfig from './shared/configs/redis.config';
 import { DatabaseCommonModule } from './models/database-common';
 import * as User from './modules/user'
+import * as Admin from './modules/admin'
 
 const UserModules = Object.values(User);
+const AdminModules = Object.values(Admin);
 
 @Module({
   imports: [
@@ -70,7 +72,8 @@ const UserModules = Object.values(User);
     HealthCheckModule,
     AuthModule,
     CronModule,
-    ...UserModules
+    ...UserModules,
+    ...AdminModules
   ],
   providers: [
     {

@@ -1,24 +1,26 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Transform, Type } from 'class-transformer';
-import { IsNotEmpty, IsString, MaxLength, MinLength, NotContains } from 'class-validator';
+import { IsNotEmpty, IsString, Matches, MaxLength, MinLength, NotContains } from 'class-validator';
 
 export class RegisterRequestDto {
   @ApiProperty({
     required: true,
     example: '84',
   })
+  @IsNotEmpty()
+  @IsString()
   @MinLength(2)
   @MaxLength(3)
-  @IsString()
-  @IsNotEmpty()
+  @Matches(/^\d{2,3}$/, { message: 'phoneCode phải có từ 2 đến 3 chữ số' })
   phoneCode: string;
   
   @ApiProperty({
     required: true,
     example: '956895689',
   })
-  @IsString()
   @IsNotEmpty()
+  @IsString()
+  @Matches(/^\d{6,12}$/, { message: 'phoneNumber phải là một chuỗi chữ số có độ dài từ 6 - 12 số' })
   phoneNumber: string;
 
   @ApiProperty({
