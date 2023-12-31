@@ -1,71 +1,71 @@
 import { Body, Controller, Delete, Get, Param, Patch, Post, Query } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Role } from 'src/shared/enums/role.enum';
-import {
-  JwtDecodedData,
-  Roles,
-} from 'src/shared/decorators/auth.decorator';
+import { Roles } from 'src/shared/decorators/auth.decorator';
 
-import { JwtAuthGuard } from 'src/shared/guards/auth.guard';
 import { ManageServiceService } from './admin-service.service';
-import { JwtPayload } from 'src/modules/auth/dto/jwt-payload.dto';
 import { CreateServiceDto } from './dto/create-service.dto';
+import { ParamServiceIdDto } from './dto/param-service.dto';
+import { ServiceEntity } from 'src/models/entities';
+import { FilterServiceDto } from './dto/query-service.dto';
+import { PaginationResponse } from 'src/shared/types/pagination-options.type';
+import { UpdateServiceDto } from './dto/update-service.dto';
 
 @ApiTags('Admin | Service')
 @ApiBearerAuth()
 @Controller('admin/service')
 @Roles([Role.Admin])
 export class ManageServiceController {
-  constructor( private readonly manageCourseService: ManageServiceService ) {}
+  constructor( private readonly manageServiceService: ManageServiceService ) {}
   
   @ApiOperation({
     summary: 'Create a service',
   })
   @Post('new')
-  async createCourse(
+  async createService(
     @Body() createService: CreateServiceDto, 
-  ): Promise<any> {
-    return this.manageCourseService.createService(createService);
+  ): Promise<ServiceEntity> {
+    return this.manageServiceService.createService(createService);
   }
   
-  // @ApiOperation({
-  //   summary: 'Thông tin của 1 khóa học',
-  // })
-  // @Get('details/:courseId')
-  // async getCourse(
-  //   @Param() paramCourseId: ParamCourseIdDto, 
-  // ): Promise<CourseEntity> {
-  //   return this.manageCourseService.getCourse(paramCourseId.courseId);
-  // }
+  @ApiOperation({
+    summary: 'get information a service',
+  })
+  @Get('details/:serviceId')
+  async getService(
+    @Param() paramServiceId: ParamServiceIdDto, 
+  ): Promise<ServiceEntity> {
+    return this.manageServiceService.getService(paramServiceId.serviceId);
+  }
   
-  // @ApiOperation({
-  //   summary: 'Lấy danh sách khóa học',
-  // })
-  // @Get('list')
-  // async getListCourses(
-  //   @Query() filterCourse: FilterCourseDto, 
-  // ): Promise<PaginationResponse<any>> {
-  //   return await this.manageCourseService.getListCourses(filterCourse);
-  // }
+  @ApiOperation({
+    summary: 'get list all services',
+  })
+  @Get('list')
+  async getListServices(
+    @Query() filterService: FilterServiceDto, 
+  ): Promise<PaginationResponse<ServiceEntity>> {
+    return await this.manageServiceService.getListServices(filterService);
+  }
   
-  // @ApiOperation({
-  //   summary: 'Cập nhật thông tin một khóa học',
-  // })
-  // @Patch(':courseId')
-  // async updateInformationCourse(
-  //   @Param() paramCourseId: ParamCourseIdDto, 
-  //   @Body() updateInformationCourse: UpdateInformationCourseDto,
-  // ): Promise<any> {
-  //   return this.manageCourseService.updateInformationCourse(paramCourseId.courseId, updateInformationCourse);
-  // }
+  @ApiOperation({
+    summary: 'update information service',
+  })
+  @Patch(':serviceId')
+  async updateService(
+    @Param() paramServiceId: ParamServiceIdDto, 
+    @Body() updateService: UpdateServiceDto,
+  ): Promise<boolean> {
+    return this.manageServiceService.updateService(paramServiceId.serviceId, updateService);
+  }
   
-  // @ApiOperation({
-  //   summary: 'Xóa một khóa học',
-  // })
-  // @Delete(':courseId')
-  // async deleteCourse(
-  //   @Param() paramCourseId: ParamCourseIdDto, 
-  // ): Promise<boolean> {
-  //   return this.manageCourseService.deleteCourse(paramCourseId.courseId);
-  // }
+  @ApiOperation({
+    summary: 'delete a service',
+  })
+  @Delete(':serviceId')
+  async deleteService(
+    @Param() paramServiceId: ParamServiceIdDto, 
+  ): Promise<boolean> {
+    return this.manageServiceService.deleteService(paramServiceId.serviceId);
+  }
 }

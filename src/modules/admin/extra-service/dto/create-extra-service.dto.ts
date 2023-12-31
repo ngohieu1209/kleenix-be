@@ -2,7 +2,7 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Transform, Type } from 'class-transformer';
 import { IsNotEmpty, IsNumber, IsOptional, IsString, MinLength, NotContains } from 'class-validator';
 
-export class CreateServiceDto {
+export class CreateExtraServiceDto {
   @ApiProperty({
     required: true,
   })
@@ -16,4 +16,20 @@ export class CreateServiceDto {
   @IsString()
   @IsOptional()
   description: string;
+  
+  @ApiProperty({
+    required: true,
+  })
+  @IsNumber()
+  @IsOptional()
+  @Type(() => Number)
+  duration: number;
+  
+  @ApiProperty({
+    required: true,
+  })
+  @IsNumber()
+  @IsOptional()
+  @Type(() => Number)
+  price: number;
 }

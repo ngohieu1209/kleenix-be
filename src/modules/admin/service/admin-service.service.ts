@@ -8,6 +8,9 @@ import _ from 'lodash'
 import { ServiceRepository } from 'src/models/repositories';
 import { CreateServiceDto } from './dto/create-service.dto';
 import { ServiceEntity } from 'src/models/entities';
+import { FilterServiceDto } from './dto/query-service.dto';
+import { PaginationResponse } from 'src/shared/types/pagination-options.type';
+import { UpdateServiceDto } from './dto/update-service.dto';
 
 @Injectable()
 export class ManageServiceService {
@@ -16,15 +19,40 @@ export class ManageServiceService {
   ) {}
 
   async createService(createService: CreateServiceDto): Promise<ServiceEntity> {
-    const { name } = createService;
+    const { name, description } = createService;
     const checkServiceExist = await this.serviceRepository.isServiceExist(name);
     if(checkServiceExist) {
       throw new BaseException(ERROR.SERVICE_EXISTED)
     }
   
     const newService = new ServiceEntity();
-    newService.name = name;  
+    newService.name = name;
+    newService.description = description;
     
     return await this.serviceRepository.save(newService);
+  }
+  
+  async updateService(serviceId: number, updateService: UpdateServiceDto): Promise<boolean> {
+    const { affected } = await this.serviceRepository.update({ id: serviceId }, updateService);
+    if(affected === 0) {
+      throw new BaseException(ERROR.SERVICE_NOT_EXIST);
+    }
+    return true;
+  }
+  
+  async getService(serviceId: number): Promise<ServiceEntity> {
+    return await this.serviceRepository.getServiceById(serviceId);
+  }
+  
+  async getListServices(filterService: FilterServiceDto): Promise<PaginationResponse<ServiceEntity>> {
+    return await this.serviceRepository.getListServices(filterService);
+  }
+  
+  async deleteService(serviceId: number): Promise<boolean> {
+    const { affected } = await this.serviceRepository.softDelete({ id: serviceId });
+    if(affected === 0) {
+      throw new BaseException(ERROR.SERVICE_NOT_EXIST);
+    }
+    return true;
   }
 }
