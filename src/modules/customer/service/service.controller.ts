@@ -5,7 +5,7 @@ import { JwtDecodedData } from 'src/shared/decorators/auth.decorator';
 import { JwtPayload } from 'src/modules/auth/dto/jwt-payload.dto';
 import { ServiceService } from './service.service';
 
-@ApiTags('User | Service')
+@ApiTags('Customer | Service')
 @ApiBearerAuth()
 @Controller('service')
 export class ServiceController {

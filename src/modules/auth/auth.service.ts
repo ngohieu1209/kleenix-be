@@ -19,9 +19,9 @@ import type {
   RegisterResponseDto,
 } from './dto/register.dto';
 import {
-  UserRepository,
+  CustomerRepository,
 } from 'src/models/repositories';
-import { UserEntity } from 'src/models/entities';
+import { CustomerEntity } from 'src/models/entities';
 import { DatabaseUtilService } from 'src/shared/services/database-util.service';
 import { DataSource } from 'typeorm';
 
@@ -30,7 +30,7 @@ export class AuthService {
   private redisInstance: Redis;
 
   constructor(
-    private readonly userRepository: UserRepository,
+    private readonly customerRepository: CustomerRepository,
     private readonly databaseUtilService: DatabaseUtilService,
     private readonly dataSource: DataSource,
     private readonly jwtService: JwtService,
@@ -57,24 +57,24 @@ export class AuthService {
 
   async login(loginRequest: LoginRequestDto): Promise<LoginResponseDto> {
     const { phoneCode, phoneNumber, password } = loginRequest;
-    const user = await this.userRepository.getUserWithPassword(phoneCode, phoneNumber);
+    const customer = await this.customerRepository.getUserWithPassword(phoneCode, phoneNumber);
     
-    const match = await compare(password, user.password);
+    const match = await compare(password, customer.password);
         
     if (!match) {
       throw new BaseException(ERROR.WRONG_PHONE_OR_PASSWORD);
     }
 
-    const accessToken = this.generateAccessToken({ userId: user.id });
+    const accessToken = this.generateAccessToken({ userId: customer.id });
 
     const signatureAccessToken = accessToken.split('.')[2];
 
-    const refreshToken = this.generateRefreshToken({ userId: user.id });
+    const refreshToken = this.generateRefreshToken({ userId: customer.id });
 
     const signatureRefreshToken = refreshToken.split('.')[2];
 
     await this.redisInstance.hsetnx(
-      `${CACHE_CONSTANT.SESSION_PREFIX}${user.id}`,
+      `${CACHE_CONSTANT.SESSION_PREFIX}${customer.id}`,
       signatureAccessToken,
       signatureRefreshToken
     );
@@ -87,8 +87,8 @@ export class AuthService {
 
   async register( registerRequest: RegisterRequestDto): Promise<RegisterResponseDto> {
     const { phoneCode, phoneNumber, name, password } = registerRequest;
-    const checkUserExist = await this.userRepository.isUserExist(phoneCode, phoneNumber);
-    if (checkUserExist) {
+    const checkCustomerExist = await this.customerRepository.isUserExist(phoneCode, phoneNumber);
+    if (checkCustomerExist) {
       throw new BaseException(ERROR.USER_EXISTED);
     }
 
@@ -97,13 +97,13 @@ export class AuthService {
       COMMON_CONSTANT.BCRYPT_SALT_ROUND
     );
     
-    const newUser = new UserEntity();
-    newUser.phoneCode = phoneCode;
-    newUser.phoneNumber = phoneNumber;
-    newUser.name = name;
-    newUser.password = hashPassword;
+    const newCustomer = new CustomerEntity();
+    newCustomer.phoneCode = phoneCode;
+    newCustomer.phoneNumber = phoneNumber;
+    newCustomer.name = name;
+    newCustomer.password = hashPassword;
     try {
-      const result = await this.userRepository.save(newUser);
+      const result = await this.customerRepository.save(newCustomer);
       return {
         id: result.id,
         phoneCode: result.phoneCode,
@@ -114,7 +114,7 @@ export class AuthService {
     }
   }
 
-  async logout(accessToken: string, userId: number): Promise<boolean> {
+  async logout(accessToken: string, userId: string): Promise<boolean> {
     const signature = accessToken.split('.')[2];
     const logoutResult = await this.redisInstance.hdel(
       `${CACHE_CONSTANT.SESSION_PREFIX}${userId}`,

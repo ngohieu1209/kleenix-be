@@ -1,6 +1,6 @@
 import { Column, Entity, OneToMany, Unique } from 'typeorm';
 import { BaseEntity } from './base.entity';
-import { UserEntity } from './user.entity';
+import { CustomerEntity } from './customer.entity';
 import { Role } from '../../shared/enums/role.enum';
 import { AdminManagerEntity } from './admin-manager.entity';
 

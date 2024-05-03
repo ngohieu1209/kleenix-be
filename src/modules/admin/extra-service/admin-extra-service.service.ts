@@ -31,15 +31,15 @@ export class ManageExtraServiceService {
     return await this.extraServiceRepository.save(newExtraService);
   }
   
-  async updateExtraService(extraServiceId: number, updateExtraService: UpdateExtraServiceDto): Promise<boolean> {
+  async updateExtraService(extraServiceId: string, updateExtraService: UpdateExtraServiceDto): Promise<boolean> {
     const { affected } = await this.extraServiceRepository.update({ id: extraServiceId }, updateExtraService);
     if(affected === 0) {
-      throw new BaseException(ERROR.EXTRA_SERVICE_EXISTED);
+      throw new BaseException(ERROR.EXTRA_SERVICE_NOT_EXIST);
     }
     return true;
   }
   
-  async getExtraService(extraServiceId: number): Promise<ExtraServiceEntity> {
+  async getExtraService(extraServiceId: string): Promise<ExtraServiceEntity> {
     return await this.extraServiceRepository.getExtraServiceById(extraServiceId);
   }
   
@@ -47,7 +47,7 @@ export class ManageExtraServiceService {
     return await this.extraServiceRepository.getListExtraServices(filterExtraService);
   }
   
-  async deleteExtraService(extraServiceId: number): Promise<boolean> {
+  async deleteExtraService(extraServiceId: string): Promise<boolean> {
     const { affected } = await this.extraServiceRepository.softDelete({ id: extraServiceId });
     if(affected === 0) {
       throw new BaseException(ERROR.EXTRA_SERVICE_NOT_EXIST);

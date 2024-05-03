@@ -24,10 +24,10 @@ import appConfig from './shared/configs/app.config';
 import fileConfig from './shared/configs/file.config';
 import redisConfig from './shared/configs/redis.config';
 import { DatabaseCommonModule } from './models/database-common';
-import * as User from './modules/user'
+import * as Customer from './modules/customer'
 import * as Admin from './modules/admin'
 
-const UserModules = Object.values(User);
+const UserModules = Object.values(Customer);
 const AdminModules = Object.values(Admin);
 
 @Module({

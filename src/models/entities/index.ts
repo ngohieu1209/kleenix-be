@@ -1,4 +1,4 @@
-export * from './user.entity'
+export * from './customer.entity'
 export * from './address.entity'
 export * from './service.entity'
 export * from './extra-service.entity'

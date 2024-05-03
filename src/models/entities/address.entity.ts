@@ -1,7 +1,7 @@
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany, Unique } from 'typeorm';
 import { BaseEntity } from './base.entity';
 import { BookingEntity } from './booking.entity';
-import { UserEntity } from './user.entity';
+import { CustomerEntity } from './customer.entity';
 
 @Entity({
   name: 'address',
@@ -36,13 +36,13 @@ export class AddressEntity extends BaseEntity {
   booking: BookingEntity[];
   
   // MANY TO ONE
-  @ManyToOne(() => UserEntity, (user) => user.address, {
+  @ManyToOne(() => CustomerEntity, (customer) => customer.address, {
     onDelete: 'CASCADE',
     orphanedRowAction: 'delete',
   })
   @JoinColumn({ 
-    name: 'user_id',
+    name: 'customer_id',
     foreignKeyConstraintName: 'FK_USER_TABLE_ADDRESS'
   })
-  user: UserEntity;
+  customer: CustomerEntity;
 }

@@ -4,10 +4,10 @@ import { AddressEntity } from './address.entity';
 import { RoleEntity } from './role.entity';
 
 @Entity({
-  name: 'user',
+  name: 'customer',
 })
 @Unique( 'UQ_USER_PHONE' ,['phoneCode', 'phoneNumber'])
-export class UserEntity extends BaseEntity {
+export class CustomerEntity extends BaseEntity {
   @Column({ select: false })
   password: string;
   
@@ -23,9 +23,36 @@ export class UserEntity extends BaseEntity {
   @Column({ default: false })
   verify: boolean;
   
+  @Column({
+    name: 'k_pay',
+    type: 'decimal',
+    precision: 10,
+    scale: 0,
+    default: 0
+  })
+  kPay: number;
+  
+  @Column({
+    name: 'k_points',
+    type: 'decimal',
+    precision: 10,
+    scale: 0,
+    default: 0
+  })
+  kPoints: number;
+  
+  @Column({
+    name: 'used_pay',
+    type: 'decimal',
+    precision: 10,
+    scale: 0,
+    default: 0
+  })
+  usedPay: number;
+  
   // RELATION
   // -----------------------------------------------------------------------------
   
-  @OneToMany(() => AddressEntity, (address) => address.user)
+  @OneToMany(() => AddressEntity, (address) => address.customer)
   address: AddressEntity[];
 }

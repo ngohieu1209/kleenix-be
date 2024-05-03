@@ -32,7 +32,7 @@ export class ManageServiceService {
     return await this.serviceRepository.save(newService);
   }
   
-  async updateService(serviceId: number, updateService: UpdateServiceDto): Promise<boolean> {
+  async updateService(serviceId: string, updateService: UpdateServiceDto): Promise<boolean> {
     const { affected } = await this.serviceRepository.update({ id: serviceId }, updateService);
     if(affected === 0) {
       throw new BaseException(ERROR.SERVICE_NOT_EXIST);
@@ -40,7 +40,7 @@ export class ManageServiceService {
     return true;
   }
   
-  async getService(serviceId: number): Promise<ServiceEntity> {
+  async getService(serviceId: string): Promise<ServiceEntity> {
     return await this.serviceRepository.getServiceById(serviceId);
   }
   
@@ -48,7 +48,7 @@ export class ManageServiceService {
     return await this.serviceRepository.getListServices(filterService);
   }
   
-  async deleteService(serviceId: number): Promise<boolean> {
+  async deleteService(serviceId: string): Promise<boolean> {
     const { affected } = await this.serviceRepository.softDelete({ id: serviceId });
     if(affected === 0) {
       throw new BaseException(ERROR.SERVICE_NOT_EXIST);

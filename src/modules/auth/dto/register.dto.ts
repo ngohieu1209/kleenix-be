@@ -46,7 +46,7 @@ export class RegisterRequestDto {
 
 export class RegisterResponseDto {
   @ApiProperty()
-  id: number
+  id: string
 
   @ApiProperty()
   phoneCode: string

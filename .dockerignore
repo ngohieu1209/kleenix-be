@@ -5,5 +5,5 @@ build
 
 logs
 
-postgres-data
-redis-data
+postgres-kleenix
+redis-kleenix

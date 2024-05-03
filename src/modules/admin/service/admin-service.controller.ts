@@ -5,7 +5,7 @@ import { Roles } from 'src/shared/decorators/auth.decorator';
 
 import { ManageServiceService } from './admin-service.service';
 import { CreateServiceDto } from './dto/create-service.dto';
-import { ParamServiceIdDto } from './dto/param-service.dto';
+import { ServiceIdDto } from 'src/shared/dtos';
 import { ServiceEntity } from 'src/models/entities';
 import { FilterServiceDto } from './dto/query-service.dto';
 import { PaginationResponse } from 'src/shared/types/pagination-options.type';
@@ -33,7 +33,7 @@ export class ManageServiceController {
   })
   @Get('details/:serviceId')
   async getService(
-    @Param() paramServiceId: ParamServiceIdDto, 
+    @Param() paramServiceId: ServiceIdDto, 
   ): Promise<ServiceEntity> {
     return this.manageServiceService.getService(paramServiceId.serviceId);
   }
@@ -53,7 +53,7 @@ export class ManageServiceController {
   })
   @Patch(':serviceId')
   async updateService(
-    @Param() paramServiceId: ParamServiceIdDto, 
+    @Param() paramServiceId: ServiceIdDto, 
     @Body() updateService: UpdateServiceDto,
   ): Promise<boolean> {
     return this.manageServiceService.updateService(paramServiceId.serviceId, updateService);
@@ -64,7 +64,7 @@ export class ManageServiceController {
   })
   @Delete(':serviceId')
   async deleteService(
-    @Param() paramServiceId: ParamServiceIdDto, 
+    @Param() paramServiceId: ServiceIdDto, 
   ): Promise<boolean> {
     return this.manageServiceService.deleteService(paramServiceId.serviceId);
   }

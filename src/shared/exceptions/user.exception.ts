@@ -11,5 +11,8 @@ export const userHttpErrors = {
     message: 'Người dùng đã tồn tại',
     code: 'USER_00003'
   },
-
+  ADDRESS_NOT_EXIST: {
+    message: 'Địa chỉ người dùng không tồn tại',
+    code: 'USER_00004'
+  },
 };

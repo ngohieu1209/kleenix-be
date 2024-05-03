@@ -15,4 +15,8 @@ export const serviceHttpErrors = {
     message: 'Dịch vụ phụ đã tồn tại',
     code: 'SERVICE_00004'
   },
+  PACKAGE_NOT_EXIST: {
+    message: 'Gói dịch vụ không tồn tại',
+    code: 'SERVICE_00005'
+  },
 };

@@ -23,7 +23,7 @@ export class ExtraServiceRepository extends Repository<ExtraServiceEntity> {
     return count > 0;
   }
   
-  async getExtraServiceById(extraServiceId: number): Promise<ExtraServiceEntity> {
+  async getExtraServiceById(extraServiceId: string): Promise<ExtraServiceEntity> {
     const extraService = await this.findOne({ where: { id: extraServiceId } });
     if(!extraService) {
       throw new BaseException(ERROR.EXTRA_SERVICE_NOT_EXIST);

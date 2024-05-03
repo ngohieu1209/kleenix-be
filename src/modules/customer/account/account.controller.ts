@@ -2,16 +2,16 @@ import { Body, Controller, Get, ParseFilePipe, Patch, UploadedFile, UseIntercept
 import { ApiBearerAuth, ApiConsumes, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { JwtDecodedData } from 'src/shared/decorators/auth.decorator';
 
-import { UserAccountService } from './account.service';
+import { CustomerAccountService } from './account.service';
 import { JwtPayload } from 'src/modules/auth/dto/jwt-payload.dto';
-import { UserEntity } from 'src/models/entities';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { CustomerEntity } from 'src/models/entities';
+import { UpdateCustomerDto } from './dto/update-user.dto';
 
-@Controller('user')
-@ApiTags('User | Account')
+@Controller('customer')
+@ApiTags('Customer | Account')
 @ApiBearerAuth()
-export class UserAccountController {
-  constructor(private readonly userAccountService: UserAccountService) {}
+export class CustomerAccountController {
+  constructor(private readonly customerAccountService: CustomerAccountService) {}
 
   @ApiOperation({
     summary: 'get information user',
@@ -19,8 +19,8 @@ export class UserAccountController {
   @Get('get-me')
   async getMe(
     @JwtDecodedData() data: JwtPayload
-  ): Promise<UserEntity> {
-    return this.userAccountService.getMe(data.userId);
+  ): Promise<CustomerEntity> {
+    return this.customerAccountService.getMe(data.userId);
   }
 
   @ApiOperation({
@@ -28,9 +28,9 @@ export class UserAccountController {
   })
   @Patch('edit')
   async updateInformationStudent(
-    @Body() updateUser: UpdateUserDto,
+    @Body() updateCustomer: UpdateCustomerDto,
     @JwtDecodedData() data: JwtPayload,
   ): Promise<string> {
-    return this.userAccountService.updateInformation(data.userId, updateUser);
+    return this.customerAccountService.updateInformation(data.userId, updateCustomer);
   }
 }

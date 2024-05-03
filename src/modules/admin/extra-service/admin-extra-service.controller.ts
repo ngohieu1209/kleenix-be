@@ -7,7 +7,7 @@ import { ExtraServiceEntity } from 'src/models/entities';
 import { PaginationResponse } from 'src/shared/types/pagination-options.type';
 import { ManageExtraServiceService } from './admin-extra-service.service';
 import { CreateExtraServiceDto } from './dto/create-extra-service.dto';
-import { ParamExtraServiceIdDto } from './dto/param-extra-service.dto';
+import { ExtraServiceIdDto } from 'src/shared/dtos';
 import { FilterExtraServiceDto } from './dto/query-extra-service.dto';
 import { UpdateExtraServiceDto } from './dto/update-extra-service.dto';
 
@@ -22,7 +22,7 @@ export class ManageExtraServiceController {
     summary: 'Create a extra service',
   })
   @Post('new')
-  async createCourse(
+  async createExtraService(
     @Body() createExtraService: CreateExtraServiceDto, 
   ): Promise<ExtraServiceEntity> {
     return this.manageExtraServiceService.createExtraService(createExtraService);
@@ -33,7 +33,7 @@ export class ManageExtraServiceController {
   })
   @Get('details/:extraServiceId')
   async getExtraService(
-    @Param() paramExtraServiceId: ParamExtraServiceIdDto, 
+    @Param() paramExtraServiceId: ExtraServiceIdDto, 
   ): Promise<ExtraServiceEntity> {
     return this.manageExtraServiceService.getExtraService(paramExtraServiceId.extraServiceId);
   }
@@ -52,8 +52,8 @@ export class ManageExtraServiceController {
     summary: 'update information extra service',
   })
   @Patch(':extraServiceId')
-  async updateInformationCourse(
-    @Param() paramExtraServiceId: ParamExtraServiceIdDto, 
+  async updateInformationExtraService(
+    @Param() paramExtraServiceId: ExtraServiceIdDto, 
     @Body() updateExtraService: UpdateExtraServiceDto,
   ): Promise<boolean> {
     return this.manageExtraServiceService.updateExtraService(paramExtraServiceId.extraServiceId, updateExtraService);
@@ -63,8 +63,8 @@ export class ManageExtraServiceController {
     summary: 'delete a extra service',
   })
   @Delete(':extraServiceId')
-  async deleteCourse(
-    @Param() paramExtraServiceId: ParamExtraServiceIdDto, 
+  async deleteExtraService(
+    @Param() paramExtraServiceId: ExtraServiceIdDto, 
   ): Promise<boolean> {
     return this.manageExtraServiceService.deleteExtraService(paramExtraServiceId.extraServiceId);
   }

@@ -1,6 +1,8 @@
 export class JwtPayload {
-  userId: number;
+  userId: string;
 
+  role?: string;
+  
   iat?: string;
 
   exp?: string;

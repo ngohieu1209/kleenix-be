@@ -12,7 +12,7 @@ export class ServiceService {
 
   ) {}
 
-  async getListServices(userId: number): Promise<any> {
+  async getListServices(customerId: string): Promise<any> {
     
   }
 }
