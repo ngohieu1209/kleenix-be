@@ -15,6 +15,7 @@ import { LoginRequestDto, LoginResponseDto } from './dto/login.dto';
 import { RefreshTokenRequestDto, RefreshTokenResponseDto } from 'src/shared/dtos';
 import { RegisterRequestDto, RegisterResponseDto } from './dto/register.dto';
 import { ChangePasswordDto } from './dto/password.dto';
+import { VerifyPhoneNumberDto } from './dto/verify.dto';
 
 @Controller('auth')
 @ApiTags('Auth')
@@ -37,11 +38,26 @@ export class AuthController {
     return this.authService.login(loginRequestDto);
   }
 
-  // @Get('verify')
-  // @Roles([Role.Admin])
-  // verify(@JwtDecodedData() data: JwtPayload): JwtPayload {
-  //   return data;
-  // }
+  @ApiOperation({
+    summary: 'Verify phone number',
+  })
+  @Post('/verify')
+  async verifyAccount(
+    @Body() verifyPhoneNumber: VerifyPhoneNumberDto,
+    @JwtDecodedData() data: JwtPayload
+  ) {
+    return this.authService.verifyAccount(data.userId, verifyPhoneNumber.code);
+  }
+
+  @ApiOperation({
+    summary: 'Resend sms code',
+  })
+  @Post('/resend-sms')
+  async resendSms(
+    @JwtDecodedData() data: JwtPayload
+  ) {
+    return this.authService.resendOTP(data.userId);
+  }
 
   @ApiOperation({
     summary: 'Register a new customer',

@@ -3,6 +3,7 @@ import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { JwtDecodedData } from 'src/shared/decorators/auth.decorator';
 
 import { BookingIdDto, JwtPayload } from 'src/shared/dtos';
+import { VerifyGuard } from 'src/shared/guards/verify.guard';
 import { BookingService } from './booking.service';
 import { CreateBookingDto } from './dto/create-booking.dto';
 import { QueryBookingDto } from './dto/query-booking.dto';
@@ -10,6 +11,7 @@ import { QueryBookingDto } from './dto/query-booking.dto';
 @ApiTags('Customer | Booking')
 @ApiBearerAuth()
 @Controller('booking')
+@UseGuards(VerifyGuard)
 export class BookingController {
   constructor(private readonly bookingService: BookingService) { }
   

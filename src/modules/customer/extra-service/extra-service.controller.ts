@@ -3,11 +3,13 @@ import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { JwtDecodedData } from 'src/shared/decorators/auth.decorator';
 
 import { JwtPayload } from 'src/shared/dtos';
+import { VerifyGuard } from 'src/shared/guards/verify.guard';
 import { ExtraServiceService } from './extra-service.service';
 
 @ApiTags('Customer | Extra Service')
 @ApiBearerAuth()
 @Controller('extra-service')
+@UseGuards(VerifyGuard)
 export class ExtraServiceController {
   constructor(private readonly extraServiceService: ExtraServiceService) { }
     

@@ -49,3 +49,10 @@ export type AllConfigType = {
   redis: RedisConfig;
   file: FileConfig;
 };
+
+export type SmsConfig = {
+  accountSID?: string;
+  authToken?: string;
+  serviceSID?: string;
+  senderPhoneNumber?: string;
+};

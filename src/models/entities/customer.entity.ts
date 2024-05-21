@@ -23,6 +23,9 @@ export class CustomerEntity extends BaseEntity {
   @Column({ default: false })
   verify: boolean;
   
+  @Column({ length: 10, nullable: true, select: false })
+  code: string;
+  
   @Column({
     name: 'k_pay',
     type: 'decimal',

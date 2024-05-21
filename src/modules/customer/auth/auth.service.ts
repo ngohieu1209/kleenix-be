@@ -11,7 +11,7 @@ import { ERROR } from 'src/shared/exceptions';
 import { Role } from 'src/shared/enums/role.enum';
 import { BaseException } from 'src/shared/filters/exception.filter';
 import { ApiConfigService } from 'src/shared/services/api-config.service';
-
+import RandomString from 'randomstring';
 import type { JwtPayload } from 'src/shared/dtos';
 import type { LoginRequestDto, LoginResponseDto } from './dto/login.dto';
 import type {
@@ -24,6 +24,7 @@ import {
 import { CustomerEntity } from 'src/models/entities';
 import { DatabaseUtilService } from 'src/shared/services/database-util.service';
 import { DataSource } from 'typeorm';
+import { SmsService } from 'src/providers/sms/sms.service';
 
 @Injectable()
 export class AuthService {
@@ -36,7 +37,8 @@ export class AuthService {
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
     private readonly redisService: RedisService,
-    private readonly apiConfigService: ApiConfigService
+    private readonly apiConfigService: ApiConfigService,
+    private readonly smsService: SmsService,
   ) {
     this.redisInstance = this.redisService.getClient(
       COMMON_CONSTANT.REDIS_DEFAULT_NAMESPACE
@@ -99,14 +101,19 @@ export class AuthService {
       password,
       COMMON_CONSTANT.BCRYPT_SALT_ROUND
     );
-    
+    const codeRandom = RandomString.generate({
+      length: 6,
+      charset: 'numeric'
+    });
     const newCustomer = new CustomerEntity();
     newCustomer.phoneCode = phoneCode;
     newCustomer.phoneNumber = phoneNumber;
     newCustomer.name = name;
     newCustomer.password = hashPassword;
+    newCustomer.code = codeRandom;
     try {
       const result = await this.customerRepository.save(newCustomer);
+      await this.smsService.initiatePhoneNumberVerification(result.phoneNumber, codeRandom);
       return {
         id: result.id,
         phoneCode: result.phoneCode,
@@ -205,5 +212,49 @@ export class AuthService {
       password: hashPassword
     })
     return affected > 0;
+  }
+  
+  async verifyAccount(customerId: string, code: string) {
+    const customer = await this.customerRepository.createQueryBuilder('customer')
+      .where('customer.id = :customerId', { customerId })
+      .addSelect('customer.code')
+      .getOne();
+    if(!customer) {
+      throw new BaseException(ERROR.USER_NOT_EXIST);
+    }
+    if(customer.verify) {
+      throw new BaseException(ERROR.USER_VERIFIED);
+    }
+    if(customer.code !== code) {
+      throw new BaseException(ERROR.INVALID_VERIFY_CODE);
+    }
+    customer.verify = true;
+    const verifiedCustomer = await this.customerRepository.save(customer);
+    return verifiedCustomer;
+  }
+
+  async resendOTP(customerId: string) {
+    const customer = await this.customerRepository.createQueryBuilder('customer')
+      .where('customer.id = :customerId', { customerId })
+      .addSelect('customer.code')
+      .getOne();
+    if(!customer) {
+      throw new BaseException(ERROR.USER_NOT_EXIST);
+    }
+    if(customer.verify) {
+      throw new BaseException(ERROR.USER_VERIFIED);
+    }
+    const codeRandom = RandomString.generate({
+      length: 6,
+      charset: 'numeric'
+    });
+    const { affected } = await this.customerRepository.update({ id: customer.id }, {
+      code: codeRandom
+    });
+    if(affected <= 0) {
+      throw new BaseException(ERROR.UPDATE_FAIL);
+    }
+    await this.smsService.initiatePhoneNumberVerification(customer.phoneNumber, codeRandom);
+    return true;
   }
 }

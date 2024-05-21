@@ -30,5 +30,9 @@ export const userHttpErrors = {
   ADDRESS_NOT_FOUND: {
     message: 'Địa chỉ không tồn tại',
     code: 'USER_00008'
-  }
+  },
+  USER_VERIFIED: {
+    message: 'Người dùng đã được xác minh',
+    code: "USER_00009"
+  },
 };

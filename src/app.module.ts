@@ -22,6 +22,7 @@ import authConfig from './shared/configs/auth.config';
 import appConfig from './shared/configs/app.config';
 import fileConfig from './shared/configs/file.config';
 import redisConfig from './shared/configs/redis.config';
+import smsConfig from './shared/configs/sms.config';
 import { DatabaseCommonModule } from './models/database-common';
 import * as Customer from './modules/customer'
 import * as Admin from './modules/admin'
@@ -43,6 +44,7 @@ const HouseWorkerModules = Object.values(HouseWorker);
         authConfig,
         appConfig,
         fileConfig,
+        smsConfig
       ],
       envFilePath: ['.env'],
     }),

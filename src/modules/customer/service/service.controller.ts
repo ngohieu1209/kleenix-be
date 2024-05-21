@@ -3,11 +3,13 @@ import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { JwtDecodedData } from 'src/shared/decorators/auth.decorator';
 
 import { JwtPayload, ServiceIdDto } from 'src/shared/dtos';
+import { VerifyGuard } from 'src/shared/guards/verify.guard';
 import { ServiceService } from './service.service';
 
 @ApiTags('Customer | Service')
 @ApiBearerAuth()
 @Controller('service')
+@UseGuards(VerifyGuard)
 export class ServiceController {
   constructor(private readonly serviceService: ServiceService) { }
     

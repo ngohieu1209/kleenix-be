@@ -37,7 +37,6 @@ export class RegisterRequestDto {
   })
   @IsString()
   @IsNotEmpty()
-  @NotContains(" ")
   @Transform(({ value }): string => value?.trim())
   @MinLength(2)
   @MaxLength(25)
