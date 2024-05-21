@@ -30,5 +30,6 @@ export class UpdateExtraServiceDto {
   @ApiPropertyOptional()
   @IsBoolean()
   @IsOptional()
-  active: boolean;
+  @Transform(({ value }): boolean => value === 'true')
+  activate: boolean;
 }

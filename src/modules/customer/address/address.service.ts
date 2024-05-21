@@ -15,7 +15,7 @@ export class AddressService {
   ) {}
 
   async createAddress(customerId: string, createAddress: CreateAddressDto): Promise<AddressEntity> {
-    const customer = await this.customerRepository.getUserById(customerId);
+    const customer = await this.customerRepository.getCustomerById(customerId);
     const checkAddressDefault = await this.addressRepository.isAddressDefaultCustomer(customerId);
   
     const newAddress = new AddressEntity();
@@ -29,14 +29,33 @@ export class AddressService {
   }
   
   async getListAddress(customerId: string): Promise<any> {
-    return await this.addressRepository.getListAddress(customerId);
+    const addresses = await this.addressRepository.getListAddress(customerId);
+    if(addresses.length > 0) {
+      return _.sortBy(addresses, (address) => address.isDefault ? 0 : 1);
+    }
+    return [];
   }
   
   async deleteAddress(customerId: string, addressId: string): Promise<boolean> {
+    const addressDefault = await this.addressRepository.getAddressDefault(customerId);
+    if(addressDefault.id === addressId) {
+      throw new BaseException(ERROR.CANT_DELETE_ADDRESS_DEFAULT);
+    }
     const { affected } = await this.addressRepository.softDelete({ id: addressId, customer: { id: customerId }});
     if(affected === 0) {
       throw new BaseException(ERROR.ADDRESS_NOT_EXIST);
     }
     return true;
+  }
+  
+  async setDefault(customerId: string, addressId: string): Promise<AddressEntity> {
+    const address = await this.addressRepository.getAddress(customerId, addressId);
+    const addressDefault = await this.addressRepository.getAddressDefault(customerId);
+    if(addressDefault.id === addressId) {
+      return address;
+    }
+    await this.addressRepository.update({ customer: { id: customerId } }, { isDefault: false });
+    address.isDefault = true;
+    return await this.addressRepository.save(address);
   }
 }

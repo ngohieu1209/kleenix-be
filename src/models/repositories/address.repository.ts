@@ -24,4 +24,20 @@ export class AddressRepository extends Repository<AddressEntity> {
     const listAddress = await this.repository.find({ where: { customer: { id: customerId } } });
     return transformToPlain<AddressEntity[]>(listAddress);
   }
+  
+  async getAddressDefault(customerId: string): Promise<AddressEntity> {
+    const address = await this.repository.findOne({ where: { customer: { id: customerId }, isDefault: true } });
+    if (!address) {
+      throw new BaseException(ERROR.ADDRESS_DEFAULT_NOT_FOUND);
+    }
+    return transformToPlain<AddressEntity>(address);
+  }
+  
+  async getAddress(customerId: string, addressId: string): Promise<AddressEntity> {
+    const address = await this.repository.findOne({ where: { id: addressId, customer: { id: customerId } }});
+    if (!address) {
+      throw new BaseException(ERROR.ADDRESS_NOT_FOUND);
+    }
+    return transformToPlain<AddressEntity>(address);
+  }
 }

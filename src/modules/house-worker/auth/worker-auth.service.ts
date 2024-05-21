@@ -12,25 +12,20 @@ import { Role } from 'src/shared/enums/role.enum';
 import { BaseException } from 'src/shared/filters/exception.filter';
 import { ApiConfigService } from 'src/shared/services/api-config.service';
 
-import type { JwtPayload } from './dto/jwt-payload.dto';
-import type { LoginRequestDto, LoginResponseDto } from './dto/login.dto';
-import type {
-  RegisterRequestDto,
-  RegisterResponseDto,
-} from './dto/register.dto';
+import type { JwtPayload } from 'src/shared/dtos';
+import type { WorkerLoginRequestDto, WorkerLoginResponseDto } from './dto/worker-login.dto';
 import {
-  CustomerRepository,
+  HouseWorkerRepository,
 } from 'src/models/repositories';
-import { CustomerEntity } from 'src/models/entities';
 import { DatabaseUtilService } from 'src/shared/services/database-util.service';
 import { DataSource } from 'typeorm';
 
 @Injectable()
-export class AuthService {
+export class WorkerAuthService {
   private redisInstance: Redis;
 
   constructor(
-    private readonly customerRepository: CustomerRepository,
+    private readonly houseWorkerRepository: HouseWorkerRepository,
     private readonly databaseUtilService: DatabaseUtilService,
     private readonly dataSource: DataSource,
     private readonly jwtService: JwtService,
@@ -55,63 +50,37 @@ export class AuthService {
     });
   }
 
-  async login(loginRequest: LoginRequestDto): Promise<LoginResponseDto> {
-    const { phoneCode, phoneNumber, password } = loginRequest;
-    const customer = await this.customerRepository.getUserWithPassword(phoneCode, phoneNumber);
+  async login(loginRequest: WorkerLoginRequestDto): Promise<any> {
+    const { username, password } = loginRequest;
+    const houseWorker = await this.houseWorkerRepository.getHouseWorkerWithPassword(username);
     
-    const match = await compare(password, customer.password);
+    const match = await compare(password, houseWorker.password);
         
     if (!match) {
       throw new BaseException(ERROR.WRONG_PHONE_OR_PASSWORD);
     }
 
-    const accessToken = this.generateAccessToken({ userId: customer.id });
+    const accessToken = this.generateAccessToken({ userId: houseWorker.id });
 
     const signatureAccessToken = accessToken.split('.')[2];
 
-    const refreshToken = this.generateRefreshToken({ userId: customer.id });
+    const refreshToken = this.generateRefreshToken({ userId: houseWorker.id });
 
     const signatureRefreshToken = refreshToken.split('.')[2];
 
     await this.redisInstance.hsetnx(
-      `${CACHE_CONSTANT.SESSION_PREFIX}${customer.id}`,
+      `${CACHE_CONSTANT.SESSION_PREFIX}${houseWorker.id}`,
       signatureAccessToken,
       signatureRefreshToken
     );
-
-    return {
-      accessToken,
-      refreshToken,
-    };
-  }
-
-  async register( registerRequest: RegisterRequestDto): Promise<RegisterResponseDto> {
-    const { phoneCode, phoneNumber, name, password } = registerRequest;
-    const checkCustomerExist = await this.customerRepository.isUserExist(phoneCode, phoneNumber);
-    if (checkCustomerExist) {
-      throw new BaseException(ERROR.USER_EXISTED);
-    }
-
-    const hashPassword = await hash(
-      password,
-      COMMON_CONSTANT.BCRYPT_SALT_ROUND
-    );
     
-    const newCustomer = new CustomerEntity();
-    newCustomer.phoneCode = phoneCode;
-    newCustomer.phoneNumber = phoneNumber;
-    newCustomer.name = name;
-    newCustomer.password = hashPassword;
-    try {
-      const result = await this.customerRepository.save(newCustomer);
-      return {
-        id: result.id,
-        phoneCode: result.phoneCode,
-        phoneNumber: result.phoneNumber
+    return {
+      user: houseWorker,
+      token: {
+        accessToken,
+        refreshToken,
       }
-    } catch (error) {
-      throw new BaseException(ERROR.REGISTER_FAIL);
-    }
+    };
   }
 
   async logout(accessToken: string, userId: string): Promise<boolean> {
@@ -124,18 +93,10 @@ export class AuthService {
     return Boolean(logoutResult);
   }
 
-  async revokeUser(userId: number): Promise<boolean> {
-    const revokeResult = await this.redisInstance.del(
-      `${CACHE_CONSTANT.SESSION_PREFIX}${userId}`
-    );
-
-    return Boolean(revokeResult);
-  }
-
   async refreshToken(
     accessToken: string,
     refreshToken: string
-  ): Promise<LoginResponseDto> {
+  ): Promise<WorkerLoginResponseDto> {
     const signatureAccessToken = accessToken.split('.')[2];
     const signatureRefreshToken = refreshToken.split('.')[2];
 
@@ -191,5 +152,24 @@ export class AuthService {
       accessToken: newAccessToken,
       refreshToken: newRefreshToken,
     };
+  }
+  
+  async changePassword(houseWorkerId: string, oldPassword: string, newPassword: string) : Promise<boolean> {
+    const houseWorker = await this.houseWorkerRepository.getHouseWorkerByIdWithPassword(houseWorkerId)
+    if(!houseWorker) {
+      throw new BaseException(ERROR.USER_NOT_EXIST);
+    }
+    const match = await compare(oldPassword, houseWorker.password);
+    if(!match) {
+      throw new BaseException(ERROR.INVALID_PASSWORD);
+    }
+    const hashPassword = await hash(
+      newPassword,
+      COMMON_CONSTANT.BCRYPT_SALT_ROUND
+    );
+    const { affected } = await this.houseWorkerRepository.update({ id: houseWorkerId }, {
+      password: hashPassword
+    })
+    return affected > 0;
   }
 }

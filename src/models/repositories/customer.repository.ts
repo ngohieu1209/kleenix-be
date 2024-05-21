@@ -15,7 +15,7 @@ export class CustomerRepository extends Repository<CustomerEntity> {
     super(repository.target, repository.manager, repository.queryRunner);
   }
 
-  async isUserExist(phoneCode: string, phoneNumber: string): Promise <boolean> {
+  async isCustomerExist(phoneCode: string, phoneNumber: string): Promise <boolean> {
     const count = await this.count({ where: { 
       phoneCode,
       phoneNumber,
@@ -23,11 +23,11 @@ export class CustomerRepository extends Repository<CustomerEntity> {
     return count > 0;
   }
   
-  async getUserWithPassword(phoneCode: string, phoneNumber: string): Promise<CustomerEntity> {
-    const user = await this.createQueryBuilder('user')
-      .andWhere('user.phoneCode = :phoneCode', { phoneCode })
-      .andWhere('user.phoneNumber = :phoneNumber', { phoneNumber })
-      .addSelect('user.password')
+  async getCustomerWithPassword(phoneCode: string, phoneNumber: string): Promise<CustomerEntity> {
+    const user = await this.createQueryBuilder('customer')
+      .andWhere('customer.phoneCode = :phoneCode', { phoneCode })
+      .andWhere('customer.phoneNumber = :phoneNumber', { phoneNumber })
+      .addSelect('customer.password')
       .getOne()
     if(!user) {
       throw new BaseException(ERROR.USER_NOT_EXIST);
@@ -35,7 +35,18 @@ export class CustomerRepository extends Repository<CustomerEntity> {
     return user;
   }
   
-  async getUserById(id: string): Promise<CustomerEntity> {
+  async getCustomerByIdWithPassword(id: string): Promise<CustomerEntity> {
+    const user = await this.createQueryBuilder('customer')
+      .andWhere('customer.id = :id', { id })
+      .addSelect('customer.password')
+      .getOne()
+    if(!user) {
+      throw new BaseException(ERROR.USER_NOT_EXIST);
+    }
+    return user;
+  }
+  
+  async getCustomerById(id: string): Promise<CustomerEntity> {
     const user = await this.findOne({ where: { id }});
     if(!user) {
       throw new BaseException(ERROR.USER_NOT_EXIST);

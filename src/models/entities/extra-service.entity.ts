@@ -15,7 +15,7 @@ export class ExtraServiceEntity extends BaseEntity {
   @Column({ nullable: true })
   description: string;
 
-  @Column({ default: true })
+  @Column({ default: false })
   activate: boolean;
   
   @Column({
@@ -25,6 +25,11 @@ export class ExtraServiceEntity extends BaseEntity {
     default: 0
   })
   price: number;
+  
+  @Column({
+    nullable: true
+  })
+  icon: string;
   
   // RELATION
   // -----------------------------------------------------------------------------

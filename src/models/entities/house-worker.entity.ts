@@ -47,7 +47,8 @@ export class HouseWorkerEntity extends BaseEntity {
   @ManyToOne(() => AdminManagerEntity, (adminManager) => adminManager.houseWorker, {
     onDelete: 'SET NULL',
     orphanedRowAction: 'nullify',
-    nullable: true
+    nullable: true,
+    eager: true
   })
   @JoinColumn({ 
     name: 'manager_id',

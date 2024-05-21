@@ -2,7 +2,7 @@ import { Body, Controller, Get, Param, Post, Query, UseGuards } from '@nestjs/co
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { JwtDecodedData } from 'src/shared/decorators/auth.decorator';
 
-import { JwtPayload } from 'src/modules/auth/dto/jwt-payload.dto';
+import { JwtPayload, ServiceIdDto } from 'src/shared/dtos';
 import { ServiceService } from './service.service';
 
 @ApiTags('Customer | Service')
@@ -19,5 +19,16 @@ export class ServiceController {
     @JwtDecodedData() data: JwtPayload,
   ): Promise<any> {
     return this.serviceService.getListServices(data.userId);
+  }
+  
+  @ApiOperation({
+    summary: 'Danh sách tất cả gói của dịch vụ',
+  })
+  @Get(':serviceId')
+  async getListPackageService(
+    @JwtDecodedData() data: JwtPayload,
+    @Param() paramService: ServiceIdDto
+  ): Promise<any> {
+    return this.serviceService.getListPackageService(data.userId, paramService.serviceId);
   }
 }

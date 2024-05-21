@@ -75,4 +75,9 @@ export class ExtraServiceRepository extends Repository<ExtraServiceEntity> {
       }
     }
   }
+  
+  async getListExtraServiceActivate(): Promise<ExtraServiceEntity[]> {
+    const extraServices = await this.find({ where: { activate: true } });
+    return transformToPlain<ExtraServiceEntity[]>(extraServices);
+  }
 }

@@ -5,6 +5,8 @@ import { BOOKING_STATUS } from '../../shared/enums/booking.enum';
 import { PackageEntity } from './package.entity';
 import { BookingExtraServiceEntity } from './booking-extra-service.entity';
 import { AssignmentEntity } from './assignment.entity';
+import { BookingPackageEntity } from './booking-package.entity';
+// import { BookingPackageEntity } from './booking-package.entity';
 
 @Entity({
   name: 'booking',
@@ -51,26 +53,21 @@ export class BookingEntity extends BaseEntity {
   @OneToMany(() => BookingExtraServiceEntity, (bookingExtraService) => bookingExtraService.booking)
   bookingExtraService: BookingExtraServiceEntity[];
   
+  @OneToMany(() => BookingPackageEntity, (bookingPackage) => bookingPackage.booking)
+  bookingPackage: BookingPackageEntity[];
+  
   @OneToMany(() => AssignmentEntity, (assignment) => assignment.booking)
   assignment: AssignmentEntity[]
   
   @ManyToOne(() => AddressEntity, (address) => address.booking, {
-    onDelete: 'CASCADE',
-    orphanedRowAction: 'delete',
+    onDelete: 'SET NULL',
+    orphanedRowAction: 'nullify',
+    nullable: true,
+    eager: true,
   })
   @JoinColumn({ 
     name: 'address_id',
     foreignKeyConstraintName: 'FK_ADDRESS_TABLE_BOOKING'
   })
   address: AddressEntity;
-  
-  @ManyToOne(() => PackageEntity, (packageEntity) => packageEntity.booking, {
-    onDelete: 'CASCADE',
-    orphanedRowAction: 'delete',
-  })
-  @JoinColumn({ 
-    name: 'package_id',
-    foreignKeyConstraintName: 'FK_PACKAGE_TABLE_BOOKING'
-  })
-  package: PackageEntity;
 }

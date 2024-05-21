@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpStatus, Post, Req } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpStatus, Post, Req } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Request } from 'express';
 import { Role } from 'src/shared/enums/role.enum';
@@ -9,12 +9,12 @@ import {
 } from 'src/shared/decorators/auth.decorator';
 
 import { AuthService } from './auth.service';
-import { JwtPayload } from './dto/jwt-payload.dto';
+import { JwtPayload } from 'src/shared/dtos';
 import { LogoutResponseDto } from './dto/logout-response.dto';
 import { LoginRequestDto, LoginResponseDto } from './dto/login.dto';
-import { RefreshTokenRequestDto, RefreshTokenResponseDto } from './dto/refresh-token.dto';
+import { RefreshTokenRequestDto, RefreshTokenResponseDto } from 'src/shared/dtos';
 import { RegisterRequestDto, RegisterResponseDto } from './dto/register.dto';
-import { RevokeUserRequestDto, RevokeUserResponseDto } from './dto/revoke-user.dto';
+import { ChangePasswordDto } from './dto/password.dto';
 
 @Controller('auth')
 @ApiTags('Auth')
@@ -27,13 +27,13 @@ export class AuthController {
   })
   @ApiResponse({
     status: HttpStatus.OK,
-    type: LoginResponseDto,
   })
   @Post('login')
   @Public()
+  @HttpCode(HttpStatus.OK)
   async login(
     @Body() loginRequestDto: LoginRequestDto,
-  ): Promise<LoginResponseDto> {
+  ): Promise<any> {
     return this.authService.login(loginRequestDto);
   }
 
@@ -44,7 +44,7 @@ export class AuthController {
   // }
 
   @ApiOperation({
-    summary: 'Register a new student',
+    summary: 'Register a new customer',
   })
   @ApiResponse({
     status: HttpStatus.OK,
@@ -75,6 +75,22 @@ export class AuthController {
       refreshTokenRequestDto.refreshToken,
     );
   }
+  
+  @ApiOperation({
+    summary: 'Change password',
+  })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    type: Boolean,
+  })
+  @Post('change-password')
+  @HttpCode(HttpStatus.OK)
+  changePassword(
+    @Body() changePassword: ChangePasswordDto,
+    @JwtDecodedData() data: JwtPayload
+  ): Promise<any> {
+    return this.authService.changePassword(data.userId, changePassword.oldPassword, changePassword.newPassword);
+  }
 
   @ApiOperation({
     summary: 'Logout',
@@ -93,27 +109,6 @@ export class AuthController {
 
     return {
       logoutResult,
-    };
-  }
-
-  @ApiOperation({
-    summary: 'Revoke user',
-  })
-  @ApiResponse({
-    status: HttpStatus.OK,
-    type: RevokeUserResponseDto,
-  })
-  @Post('revoke-user')
-  @Roles([Role.Admin])
-  async revokeUser(
-    @Body() revokeUserRequestDto: RevokeUserRequestDto,
-  ): Promise<RevokeUserResponseDto> {
-    const revokeResult = await this.authService.revokeUser(
-      revokeUserRequestDto.id,
-    );
-
-    return {
-      revokeResult,
     };
   }
 }

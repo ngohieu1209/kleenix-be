@@ -1,8 +1,8 @@
 version: '3.6'
 services:
-  # zen-app:
+  # kleenix-app:
   #   build: .
-  #   container_name: zen-app
+  #   container_name: kleenix-app
   #   env_file:
   #     - .env.production
   #   ports:
@@ -11,7 +11,7 @@ services:
   #     - redis
   #     - postgres
   #   networks:
-  #     - zen_net
+  #     - kleenix_net
 
   postgres:
     image: postgres:15

@@ -42,3 +42,10 @@ export class AddressIdDto {
   @IsNotEmpty()
   addressId: string;
 }
+
+export class BookingIdDto {
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  bookingId: string;
+}

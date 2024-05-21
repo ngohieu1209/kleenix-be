@@ -15,4 +15,20 @@ export const userHttpErrors = {
     message: 'Địa chỉ người dùng không tồn tại',
     code: 'USER_00004'
   },
+  ADDRESS_DEFAULT_NOT_FOUND: {
+    message: 'Địa chỉ mặc định không tồn tại',
+    code: 'USER_00005'
+  },
+  INVALID_PASSWORD: {
+    message: 'Mật khẩu không hợp lệ',
+    code: 'USER_00006'
+  },
+  CANT_DELETE_ADDRESS_DEFAULT: {
+    message: 'Không thể xóa địa chỉ mặc định',
+    code: 'USER_00007'
+  },
+  ADDRESS_NOT_FOUND: {
+    message: 'Địa chỉ không tồn tại',
+    code: 'USER_00008'
+  }
 };

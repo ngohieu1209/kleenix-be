@@ -1,5 +1,5 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, Query } from '@nestjs/common';
-import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { Body, Controller, Delete, Get, Param, ParseFilePipe, Patch, Post, Query, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { ApiBearerAuth, ApiConsumes, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Role } from 'src/shared/enums/role.enum';
 import { Roles } from 'src/shared/decorators/auth.decorator';
 
@@ -10,6 +10,8 @@ import { CreateExtraServiceDto } from './dto/create-extra-service.dto';
 import { ExtraServiceIdDto } from 'src/shared/dtos';
 import { FilterExtraServiceDto } from './dto/query-extra-service.dto';
 import { UpdateExtraServiceDto } from './dto/update-extra-service.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { ImageFileValidator } from 'src/shared/validators/image-file.validator';
 
 @ApiTags('Admin | Extra Service')
 @ApiBearerAuth()
@@ -21,17 +23,25 @@ export class ManageExtraServiceController {
   @ApiOperation({
     summary: 'Create a extra service',
   })
+  @ApiConsumes('multipart/form-data')
+  @UseInterceptors(FileInterceptor('icon'))
   @Post('new')
   async createExtraService(
     @Body() createExtraService: CreateExtraServiceDto, 
+    @UploadedFile(
+      new ParseFilePipe({
+        validators: [new ImageFileValidator({})],
+        fileIsRequired: false
+      }),
+    ) icon?: Express.Multer.File,
   ): Promise<ExtraServiceEntity> {
-    return this.manageExtraServiceService.createExtraService(createExtraService);
+    return this.manageExtraServiceService.createExtraService(createExtraService, icon);
   }
   
   @ApiOperation({
     summary: 'get information a extra service',
   })
-  @Get('details/:extraServiceId')
+  @Get('detail/:extraServiceId')
   async getExtraService(
     @Param() paramExtraServiceId: ExtraServiceIdDto, 
   ): Promise<ExtraServiceEntity> {
@@ -51,12 +61,20 @@ export class ManageExtraServiceController {
   @ApiOperation({
     summary: 'update information extra service',
   })
+  @ApiConsumes('multipart/form-data')
+  @UseInterceptors(FileInterceptor('icon'))
   @Patch(':extraServiceId')
   async updateInformationExtraService(
     @Param() paramExtraServiceId: ExtraServiceIdDto, 
     @Body() updateExtraService: UpdateExtraServiceDto,
+    @UploadedFile(
+      new ParseFilePipe({
+        validators: [new ImageFileValidator({})],
+        fileIsRequired: false
+      }),
+    ) icon?: Express.Multer.File,
   ): Promise<boolean> {
-    return this.manageExtraServiceService.updateExtraService(paramExtraServiceId.extraServiceId, updateExtraService);
+    return this.manageExtraServiceService.updateExtraService(paramExtraServiceId.extraServiceId, updateExtraService, icon);
   }
   
   @ApiOperation({

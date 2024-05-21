@@ -16,4 +16,8 @@ export class CreateServiceDto {
   @IsString()
   @IsOptional()
   description: string;
+  
+  @ApiPropertyOptional({ type: 'string', format: 'binary', required: false })
+  @IsOptional()
+  icon: Express.Multer.File;
 }

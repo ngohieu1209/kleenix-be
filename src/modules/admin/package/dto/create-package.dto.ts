@@ -1,6 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsOptional, IsString, MinLength } from 'class-validator';
 
 export class CreatePackageDto {
   @ApiPropertyOptional()
@@ -11,10 +11,10 @@ export class CreatePackageDto {
   @ApiProperty({
     required: true,
   })
-  @IsNumber()
+  @IsString()
   @IsNotEmpty()
-  @Type(() => Number)
-  room: number;
+  @MinLength(2)
+  name: string;
   
   @ApiProperty({
     required: true,
@@ -32,7 +32,9 @@ export class CreatePackageDto {
   @Type(() => Number)
   price: number;
   
-  @ApiProperty()
+  @ApiProperty({
+    required: true,
+  })
   @IsString()
   @IsNotEmpty()
   serviceId: string;

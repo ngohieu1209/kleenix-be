@@ -12,8 +12,13 @@ export class ServiceEntity extends BaseEntity {
   @Column({ nullable: true })
   description: string;
   
-  @Column({ default: true })
-  active: boolean;
+  @Column({ default: false })
+  activate: boolean;
+  
+  @Column({
+    nullable: true
+  })
+  icon: string;
   
   // RELATION
   // -----------------------------------------------------------------------------

@@ -75,4 +75,9 @@ export class ServiceRepository extends Repository<ServiceEntity> {
       }
     }
   }
+  
+  async getListServiceActivate(): Promise<ServiceEntity[]> {
+    const service = await this.find({ where: { activate: true } });
+    return transformToPlain<ServiceEntity[]>(service);
+  }
 }

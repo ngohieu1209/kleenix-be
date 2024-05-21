@@ -24,7 +24,7 @@ export class RoleGuard implements CanActivate {
     const decoded = context.switchToHttp().getRequest()[
       COMMON_CONSTANT.JWT_DECODED_REQUEST_PARAM
     ];
-
+        
     if (!requiredRoles.includes(decoded.role)) {
       throw new BaseException(ERROR.FORBIDDEN, HttpStatus.FORBIDDEN);
     }

@@ -19,7 +19,11 @@ async function bootstrap() {
   const port = configService.getOrThrow('app.port', { infer: true });
   const appName = configService.getOrThrow('app.name', { infer: true });
 
-  app.use(helmet());
+  app.use(helmet({
+    crossOriginResourcePolicy: { policy: "cross-origin" },
+    // crossOriginEmbedderPolicy: false,
+    // crossOriginOpenerPolicy: false,
+  }));
   app.setGlobalPrefix(configService.getOrThrow('app.apiPrefix', { infer: true }));
   app.useGlobalPipes(
     new ValidationPipe({

@@ -31,7 +31,7 @@ export class ManageHouseWorkerController {
   @ApiOperation({
     summary: 'get information a house worker',
   })
-  @Get('details/:houseWorkerId')
+  @Get('detail/:houseWorkerId')
   async getHouseWorker(
     @Param() paramHouseWorkerId: HouseWorkerIdDto, 
   ): Promise<HouseWorkerEntity> {

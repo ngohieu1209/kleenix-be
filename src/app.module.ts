@@ -8,7 +8,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { BullModule } from '@nestjs/bull';
 
 import { COMMON_CONSTANT } from './shared/constants/common.constant';
-import { AuthModule } from './modules/auth/auth.module';
 import { CronModule } from './modules/cron/cron.module';
 import { HealthCheckModule } from './modules/health-check/health-check.module';
 import { HttpExceptionFilter } from './shared/filters/exception.filter';
@@ -26,9 +25,13 @@ import redisConfig from './shared/configs/redis.config';
 import { DatabaseCommonModule } from './models/database-common';
 import * as Customer from './modules/customer'
 import * as Admin from './modules/admin'
+import * as HouseWorker from './modules/house-worker'
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 
 const UserModules = Object.values(Customer);
 const AdminModules = Object.values(Admin);
+const HouseWorkerModules = Object.values(HouseWorker);
 
 @Module({
   imports: [
@@ -67,13 +70,18 @@ const AdminModules = Object.values(Admin);
         port: parseInt(process.env.REDIS_PORT),
       },
     }),
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'uploads'),
+      serveRoot: '/uploads', 
+      exclude: ['/api*']
+    }),
     SharedModule,
     DatabaseCommonModule,
     HealthCheckModule,
-    AuthModule,
     CronModule,
     ...UserModules,
-    ...AdminModules
+    ...AdminModules,
+    ...HouseWorkerModules,
   ],
   providers: [
     {

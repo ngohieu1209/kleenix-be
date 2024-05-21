@@ -3,7 +3,7 @@ import { ApiBearerAuth, ApiConsumes, ApiOperation, ApiTags } from '@nestjs/swagg
 import { JwtDecodedData } from 'src/shared/decorators/auth.decorator';
 
 import { CustomerAccountService } from './account.service';
-import { JwtPayload } from 'src/modules/auth/dto/jwt-payload.dto';
+import { JwtPayload } from 'src/shared/dtos';
 import { CustomerEntity } from 'src/models/entities';
 import { UpdateCustomerDto } from './dto/update-user.dto';
 

@@ -15,7 +15,7 @@ export class CustomerAccountService {
   ) {}
 
   async getMe(userId: string): Promise<CustomerEntity> {
-    return await this.customerRepository.getUserById(userId);
+    return await this.customerRepository.getCustomerById(userId);
   }
   
   async updateInformation(userId: string, updateUser: UpdateCustomerDto) {

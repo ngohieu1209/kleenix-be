@@ -70,4 +70,23 @@ export class PackageRepository extends Repository<PackageEntity> {
       }
     }
   }
+  
+  async getListPackageByService(serviceId: string) {
+    const packages = await this.createQueryBuilder('package')
+      .innerJoin('package.service', 'service')
+      .where('service.id = :serviceId', { serviceId })
+      .orderBy('package.price', 'ASC')
+      .getMany();
+    return packages;
+  }
+  
+  async getListPackageActivateByService(serviceId: string) {
+    const packages = await this.createQueryBuilder('package')
+      .innerJoin('package.service', 'service')
+      .where('service.id = :serviceId', { serviceId })
+      .andWhere('package.activate = :activate', { activate: true })
+      .orderBy('package.price', 'ASC')
+      .getMany();
+    return packages;
+  }
 }

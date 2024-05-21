@@ -25,6 +25,7 @@ export class AdminManagerEntity extends BaseEntity {
   houseWorker: HouseWorkerEntity[];
   
   @ManyToOne(() => RoleEntity, (role) => role.adminManager, {
+    eager: true,
     onDelete: 'CASCADE',
     orphanedRowAction: 'delete',
   })

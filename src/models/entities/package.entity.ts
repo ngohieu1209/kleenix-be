@@ -1,5 +1,6 @@
 import { Column, Entity, Index, JoinColumn, ManyToOne, OneToMany, Unique } from 'typeorm';
 import { BaseEntity } from './base.entity';
+import { BookingPackageEntity } from './booking-package.entity';
 import { BookingEntity } from './booking.entity';
 import { ServiceEntity } from './service.entity';
 
@@ -8,15 +9,15 @@ import { ServiceEntity } from './service.entity';
 })
 export class PackageEntity extends BaseEntity {
   @Column()
+  name: string;
+  
+  @Column()
   duration: number;
-
-  @Column({ nullable: true })
-  room: number;
 
   @Column({ nullable: true })
   description: string;
 
-  @Column({ default: true })
+  @Column({ default: false })
   activate: boolean;
   
   @Column({
@@ -30,12 +31,13 @@ export class PackageEntity extends BaseEntity {
   // RELATION
   // -----------------------------------------------------------------------------
   
-  @OneToMany(() => BookingEntity, (booking) => booking.package)
-  booking: BookingEntity[];
+  @OneToMany(() => BookingPackageEntity, (bookingPackage) => bookingPackage.package)
+  bookingPackage: BookingPackageEntity[];
   
   @ManyToOne(() => ServiceEntity, (service) => service.package, {
     onDelete: 'CASCADE',
     orphanedRowAction: 'delete',
+    eager: true
   })
   @JoinColumn({ 
     name: 'service_id',

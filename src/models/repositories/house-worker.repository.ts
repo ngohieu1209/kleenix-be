@@ -22,6 +22,28 @@ export class HouseWorkerRepository extends Repository<HouseWorkerEntity> {
     return count > 0;
   }
   
+  async getHouseWorkerWithPassword(username: string): Promise<HouseWorkerEntity> {
+    const user = await this.createQueryBuilder('houseWorker')
+      .andWhere('houseWorker.username = :username', { username })
+      .addSelect('houseWorker.password')
+      .getOne()
+    if(!user) {
+      throw new BaseException(ERROR.USER_NOT_EXIST);
+    }
+    return user;
+  }
+  
+  async getHouseWorkerByIdWithPassword(id: string): Promise<HouseWorkerEntity> {
+    const user = await this.createQueryBuilder('houseWorker')
+      .andWhere('houseWorker.id = :id', { id })
+      .addSelect('houseWorker.password')
+      .getOne()
+    if(!user) {
+      throw new BaseException(ERROR.USER_NOT_EXIST);
+    }
+    return user;
+  }
+  
   async getHouseWorkerById(houseWorkerId: string): Promise<HouseWorkerEntity> {
     const houseWorker = await this.findOne({ where: { id: houseWorkerId } });
     if(!houseWorker) {

@@ -1,3 +1,6 @@
+export * from './auth/auth.module'
 export * from './account/account.module'
 export * from './service/service.module'
 export * from './address/address.module'
+export * from './booking/booking.module'
+export * from './extra-service/extra-service.module'

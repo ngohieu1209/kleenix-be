@@ -13,6 +13,7 @@ export class BookingExtraServiceEntity extends BaseEntity {
   @ManyToOne(() => BookingEntity, (booking) => booking.bookingExtraService, {
     onDelete: 'CASCADE',
     orphanedRowAction: 'delete',
+    eager: true,
   })
   @JoinColumn({ 
     name: 'booking_id',
@@ -23,6 +24,7 @@ export class BookingExtraServiceEntity extends BaseEntity {
   @ManyToOne(() => ExtraServiceEntity, (extraService) => extraService.bookingExtraService, {
     onDelete: 'CASCADE',
     orphanedRowAction: 'delete',
+    eager: true,
   })
   @JoinColumn({ 
     name: 'extra_service_id',

@@ -15,5 +15,28 @@ export class AdminManagerRepository extends Repository<AdminManagerEntity> {
     super(repository.target, repository.manager, repository.queryRunner);
   }
 
-
+  async isAdminManagerExist(username: string): Promise <boolean> {
+    const count = await this.count({ where: { username } });
+    return count > 0;
+  }
+  
+  async getAdminManagerWithPassword(username: string): Promise<AdminManagerEntity> {
+    const user = await this.createQueryBuilder('adminManager')
+      .andWhere('adminManager.username = :username', { username })
+      .addSelect('adminManager.password')
+      .innerJoinAndSelect('adminManager.role', 'role')
+      .getOne()
+    if(!user) {
+      throw new BaseException(ERROR.USER_NOT_EXIST);
+    }
+    return user;
+  }
+  
+  async getAdminManagerById(id: string): Promise<AdminManagerEntity> {
+    const user = await this.findOne({ where: { id }});
+    if(!user) {
+      throw new BaseException(ERROR.USER_NOT_EXIST);
+    }
+    return transformToPlain<AdminManagerEntity>(user);
+  }
 }

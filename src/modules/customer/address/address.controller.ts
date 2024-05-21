@@ -7,7 +7,7 @@ import { AddressEntity } from 'src/models/entities';
 import { PaginationResponse } from 'src/shared/types/pagination-options.type';
 import { AddressIdDto } from 'src/shared/dtos';
 import { AddressService } from './address.service';
-import { JwtPayload } from 'src/modules/auth/dto/jwt-payload.dto';
+import { JwtPayload } from 'src/shared/dtos';
 import { CreateAddressDto } from './dto/create-address.dto';
 
 @ApiTags('Customer | Address')
@@ -35,6 +35,17 @@ export class AddressController {
     @JwtDecodedData() dataCustomer: JwtPayload,
   ): Promise<any> {
     return await this.addressService.getListAddress(dataCustomer.userId);
+  }
+  
+  @ApiOperation({
+    summary: 'set address default',
+  })
+  @Post('set-default')
+  async setDefault(
+    @JwtDecodedData() dataCustomer: JwtPayload,
+    @Body() setAddressDefault: AddressIdDto, 
+  ): Promise<AddressEntity> {
+    return this.addressService.setDefault(dataCustomer.userId, setAddressDefault.addressId);
   }
   
   @ApiOperation({

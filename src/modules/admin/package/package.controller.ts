@@ -31,7 +31,7 @@ export class ManagePackageController {
   @ApiOperation({
     summary: 'get information a package',
   })
-  @Get('details/:packageId')
+  @Get('detail/:packageId')
   async getPackage(
     @Param() paramPackageId: PackageIdDto, 
   ): Promise<PackageEntity> {
@@ -39,7 +39,7 @@ export class ManagePackageController {
   }
   
   @ApiOperation({
-    summary: 'get list all packages',
+    summary: 'get list package',
   })
   @Get('list')
   async getListPackage(

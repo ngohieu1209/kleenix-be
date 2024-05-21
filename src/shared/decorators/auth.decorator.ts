@@ -3,7 +3,7 @@ import { createParamDecorator, SetMetadata } from '@nestjs/common';
 import type { Request } from 'express';
 import { COMMON_CONSTANT } from 'src/shared/constants/common.constant';
 import type { Role } from 'src/shared/enums/role.enum';
-import type { JwtPayload } from 'src/modules/auth/dto/jwt-payload.dto';
+import type { JwtPayload } from 'src/shared/dtos';
 
 export const IS_PUBLIC = 'isPublic';
 export const Public = () => SetMetadata(IS_PUBLIC, true);
