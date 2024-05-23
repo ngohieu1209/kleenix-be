@@ -29,6 +29,7 @@ import * as Admin from './modules/admin'
 import * as HouseWorker from './modules/house-worker'
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
+import stripeConfig from './shared/configs/stripe.config';
 
 const UserModules = Object.values(Customer);
 const AdminModules = Object.values(Admin);
@@ -44,7 +45,8 @@ const HouseWorkerModules = Object.values(HouseWorker);
         authConfig,
         appConfig,
         fileConfig,
-        smsConfig
+        smsConfig,
+        stripeConfig
       ],
       envFilePath: ['.env'],
     }),

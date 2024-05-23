@@ -25,6 +25,7 @@ export class BookingRepository extends Repository<BookingEntity> {
       .innerJoinAndSelect('bookingPackage.package', 'package')
       .innerJoinAndSelect('package.service', 'service')
       .leftJoinAndSelect('booking.bookingExtraService', 'bookingExtraService')
+      .leftJoinAndSelect('bookingExtraService.extraService', 'extraService')
       .innerJoinAndSelect('address.customer', 'customer')
       .where('booking.id = :bookingId', { bookingId })
       .getOne();
@@ -50,6 +51,7 @@ export class BookingRepository extends Repository<BookingEntity> {
       .innerJoinAndSelect('bookingPackage.package', 'package')
       .innerJoinAndSelect('package.service', 'service')
       .leftJoinAndSelect('booking.bookingExtraService', 'bookingExtraService')
+      .leftJoinAndSelect('bookingExtraService.extraService', 'extraService')
       .where('address.customer.id = :customerId', { customerId });
       if (startDate && endDate) {
         query.andWhere('DATE(booking.dateTime) BETWEEN :startDate AND :endDate', {
@@ -80,6 +82,7 @@ export class BookingRepository extends Repository<BookingEntity> {
       .innerJoinAndSelect('bookingPackage.package', 'package')
       .innerJoinAndSelect('package.service', 'service')
       .leftJoinAndSelect('booking.bookingExtraService', 'bookingExtraService')
+      .leftJoinAndSelect('bookingExtraService.extraService', 'extraService')
       .innerJoinAndSelect('address.customer', 'customer')
       if(search) {
         query.andWhere('customer.name LIKE :search', { search: `%${search}%` });

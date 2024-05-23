@@ -56,3 +56,7 @@ export type SmsConfig = {
   serviceSID?: string;
   senderPhoneNumber?: string;
 };
+
+export type StripeConfig = {
+  stripeSecretKey?: string;
+};

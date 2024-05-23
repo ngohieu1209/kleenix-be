@@ -1,8 +1,8 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 
 import _ from 'lodash';
-import { BookingEntity, BookingExtraServiceEntity, BookingPackageEntity, CustomerEntity, PackageEntity } from 'src/models/entities';
-import { AddressRepository, BookingExtraServiceRepository, BookingRepository } from 'src/models/repositories';
+import { BookingEntity, BookingExtraServiceEntity, BookingPackageEntity, CustomerEntity, ExtraServiceEntity, PackageEntity } from 'src/models/entities';
+import { AddressRepository, BookingExtraServiceRepository, BookingRepository, ExtraServiceRepository } from 'src/models/repositories';
 import { BookingPackageRepository } from 'src/models/repositories/booking-package.repository';
 import { BOOKING_STATUS } from 'src/shared/enums/booking.enum';
 import { ERROR } from 'src/shared/exceptions';
@@ -29,8 +29,8 @@ export class BookingService {
       const result = await this.databaseUtilService.executeTransaction(
         this.dataSource,
         async (queryRunner) => {
-          const bookingExtraServiceRepository = queryRunner.manager.getRepository(BookingExtraServiceEntity);
-          const bookingPackageRepository = queryRunner.manager.getRepository(PackageEntity);
+          const extraServiceRepository = queryRunner.manager.getRepository(ExtraServiceEntity);
+          const packageRepository = queryRunner.manager.getRepository(PackageEntity);
           const checkAddressDefault = await this.addressRepository.isAddressDefaultCustomer(customerId);
           if(!checkAddressDefault) {
             throw new BaseException(ERROR.ADDRESS_DEFAULT_NOT_FOUND);
@@ -39,7 +39,7 @@ export class BookingService {
           const newBooking = new BookingEntity();
           newBooking.address = addressDefault;
           newBooking.totalPrice = totalPrice;
-          newBooking.dateTime = dateTime;
+          newBooking.dateTime = new Date(dateTime);
           newBooking.duration = duration;
           newBooking.note = note;
           newBooking.status = BOOKING_STATUS.PENDING;
@@ -48,14 +48,13 @@ export class BookingService {
           
           const packageIds = _.map(listPackage, 'packageId');
           
-          const packages = await bookingPackageRepository.find({
+          const packages = await packageRepository.find({
             where: {
               id: In(packageIds)
             }
           });
-          
           if(extraServiceIds.length > 0) {
-            const extraServices = await bookingExtraServiceRepository.find({
+            const extraServices = await extraServiceRepository.find({
               where: {
                 id: In(extraServiceIds)
               }

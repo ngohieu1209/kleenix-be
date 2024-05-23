@@ -35,4 +35,12 @@ export const userHttpErrors = {
     message: 'Người dùng đã được xác minh',
     code: "USER_00009"
   },
+  REQUEST_PAYMENT_FAIL: {
+    message: 'Yêu cầu nạp tiền thất bại',
+    code: 'USER_00010'
+  },
+  PAYMENT_SUCCESS_FAIL: {
+    message: 'Nạp tiền thất bại',
+    code: 'USER_00011'
+  },
 };

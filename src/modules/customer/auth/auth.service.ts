@@ -102,7 +102,7 @@ export class AuthService {
       COMMON_CONSTANT.BCRYPT_SALT_ROUND
     );
     const codeRandom = RandomString.generate({
-      length: 6,
+      length: 4,
       charset: 'numeric'
     });
     const newCustomer = new CustomerEntity();
@@ -245,7 +245,7 @@ export class AuthService {
       throw new BaseException(ERROR.USER_VERIFIED);
     }
     const codeRandom = RandomString.generate({
-      length: 6,
+      length: 4,
       charset: 'numeric'
     });
     const { affected } = await this.customerRepository.update({ id: customer.id }, {
