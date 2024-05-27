@@ -1,13 +1,14 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 
 import _ from 'lodash';
-import { BookingEntity, BookingExtraServiceEntity, BookingPackageEntity, CustomerEntity, ExtraServiceEntity, PackageEntity } from 'src/models/entities';
-import { AddressRepository, BookingExtraServiceRepository, BookingRepository, ExtraServiceRepository } from 'src/models/repositories';
+import { BookingEntity, BookingExtraServiceEntity, BookingPackageEntity, CustomerEntity, CustomerPromotionEntity, ExtraServiceEntity, PackageEntity } from 'src/models/entities';
+import { AddressRepository, BookingExtraServiceRepository, BookingRepository, CustomerPromotionRepository, CustomerRepository, ExtraServiceRepository, PromotionRepository } from 'src/models/repositories';
 import { BookingPackageRepository } from 'src/models/repositories/booking-package.repository';
-import { BOOKING_STATUS } from 'src/shared/enums/booking.enum';
+import { BOOKING_STATUS, PAYMENT_STATUS } from 'src/shared/enums/booking.enum';
 import { ERROR } from 'src/shared/exceptions';
 import { BaseException } from 'src/shared/filters/exception.filter';
 import { DatabaseUtilService } from 'src/shared/services/database-util.service';
+import { transformPoint } from 'src/shared/utils/utils';
 import { DataSource, In } from 'typeorm';
 import { CreateBookingDto } from './dto/create-booking.dto';
 import { QueryBookingDto } from './dto/query-booking.dto';
@@ -15,20 +16,24 @@ import { QueryBookingDto } from './dto/query-booking.dto';
 @Injectable()
 export class BookingService {
   constructor(
+    private readonly customerRepository: CustomerRepository,
     private readonly bookingRepository: BookingRepository,
     private readonly bookingExtraServiceRepository: BookingExtraServiceRepository,
     private readonly bookingPackageRepository: BookingPackageRepository,
+    private readonly promotionRepository: PromotionRepository,
+    private readonly customerPromotionRepository: CustomerPromotionRepository,
     private readonly addressRepository: AddressRepository,
     private readonly databaseUtilService: DatabaseUtilService,
     private readonly dataSource: DataSource,
   ) {}
   
   async createBooking(customerId: string, createBooking: CreateBookingDto) {
-    const { listPackage, extraServiceIds, totalPrice, dateTime, duration, note } = createBooking;
+    const { listPackage, extraServiceIds, totalPrice, dateTime, duration, note, paymentStatus, promotionId } = createBooking;
     try {
       const result = await this.databaseUtilService.executeTransaction(
         this.dataSource,
         async (queryRunner) => {
+          let booking = null;
           const extraServiceRepository = queryRunner.manager.getRepository(ExtraServiceEntity);
           const packageRepository = queryRunner.manager.getRepository(PackageEntity);
           const checkAddressDefault = await this.addressRepository.isAddressDefaultCustomer(customerId);
@@ -38,13 +43,14 @@ export class BookingService {
           const addressDefault = await this.addressRepository.getAddressDefault(customerId);
           const newBooking = new BookingEntity();
           newBooking.address = addressDefault;
-          newBooking.totalPrice = totalPrice;
+          newBooking.totalPrice = Number(totalPrice);
           newBooking.dateTime = new Date(dateTime);
           newBooking.duration = duration;
           newBooking.note = note;
           newBooking.status = BOOKING_STATUS.PENDING;
+          newBooking.paymentStatus = paymentStatus;
           
-          const booking = await queryRunner.manager.save(newBooking);
+          booking = await queryRunner.manager.save(newBooking);
           
           const packageIds = _.map(listPackage, 'packageId');
           
@@ -84,6 +90,25 @@ export class BookingService {
             insertBulkPackages
           );
           
+          if(promotionId) {
+            const customerPromotion = await this.customerPromotionRepository.getPromotionClaimed(customerId, promotionId);
+            customerPromotion.booking = booking;
+            customerPromotion.isUsed = true;
+            customerPromotion.priceDiscount = Number(customerPromotion.promotion.discount);
+            await queryRunner.manager.update(CustomerPromotionEntity, customerPromotion.id, customerPromotion);
+            booking.totalPrice = Number(booking.totalPrice) - Number(customerPromotion.promotion.discount);
+            booking = await queryRunner.manager.save(booking as BookingEntity);
+          }
+          
+          if(paymentStatus === PAYMENT_STATUS.KPAY) {
+            const customer = await this.customerRepository.getCustomerById(customerId);
+            if(Number(customer.kPay) < Number(booking.totalPrice)) {
+              throw new BaseException(ERROR.KPAY_NOT_ENOUGH);
+            }
+            customer.kPay = Number(customer.kPay) - Number(booking.totalPrice);
+            await queryRunner.manager.update(CustomerEntity, customer.id, customer);
+          }
+          
           return booking;
         }
       );
@@ -96,13 +121,37 @@ export class BookingService {
   
   async cancelBooking(customerId: string, bookingId: string) {
     const booking = await this.bookingRepository.getBookingByCustomer(customerId, bookingId);
-    if(booking.status === BOOKING_STATUS.PENDING) {
-      booking.status = BOOKING_STATUS.CANCELLED_BY_CUSTOMER;
-    } else {
-      throw new BadRequestException('Nhân viên đã nhận đơn booking. Hãy liên hệ với chúng tôi để được hỗ trợ');
+
+    try {
+      await this.databaseUtilService.executeTransaction(
+        this.dataSource,
+        async (queryRunner) => {
+          const customerPromotionRepository = queryRunner.manager.getRepository(CustomerPromotionEntity);
+          const customerRepository = queryRunner.manager.getRepository(CustomerEntity);
+          if(booking.status === BOOKING_STATUS.PENDING) {
+            await queryRunner.manager.update(BookingEntity, booking.id, { status: BOOKING_STATUS.CANCELLED_BY_CUSTOMER });
+            if(booking.customerPromotion.length > 0) {
+              const customerPromotion = await customerPromotionRepository.findOne({ where: { id: booking.customerPromotion[0].id } });
+              customerPromotion.isUsed = false;
+              customerPromotion.booking = null;
+              customerPromotion.priceDiscount = 0;
+              await queryRunner.manager.update(CustomerPromotionEntity, customerPromotion.id, customerPromotion);
+            }
+            if(booking.paymentStatus === PAYMENT_STATUS.KPAY) {
+              const customer = await customerRepository.findOne({ where: { id: customerId } });
+              customer.kPay = Number(customer.kPay) + Number(booking.totalPrice);
+              await queryRunner.manager.update(CustomerEntity, customer.id, customer);
+            }
+          } else {
+            throw new BadRequestException('Nhân viên đã nhận đơn booking. Hãy liên hệ với chúng tôi để được hỗ trợ');
+          }
+        }
+      );
+      return true;
+    } catch (error) {
+      console.log('cancel-booking-error: ', error);
+      throw new BadRequestException(error.message);
     }
-    await this.bookingRepository.save(booking);
-    return true;
   }
   
   async getListBooking(customerId: string, queryBooking: QueryBookingDto) {

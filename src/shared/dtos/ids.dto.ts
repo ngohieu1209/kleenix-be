@@ -49,3 +49,17 @@ export class BookingIdDto {
   @IsNotEmpty()
   bookingId: string;
 }
+
+export class PromotionIdDto {
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  promotionId: string;
+}
+
+export class FeedbackIdDto {
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  feedbackId: string;
+}

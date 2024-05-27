@@ -1,7 +1,7 @@
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
 import { Type } from "class-transformer";
 import { IsArray, IsDateString, IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString, ValidateNested } from "class-validator";
-import { BOOKING_STATUS } from "src/shared/enums/booking.enum";
+import { BOOKING_STATUS, PAYMENT_STATUS } from "src/shared/enums/booking.enum";
 
 class ObjectPackage {
   @ApiProperty()
@@ -26,6 +26,11 @@ export class CreateBookingDto {
   @IsArray()
   @IsNotEmpty()
   extraServiceIds: string[];
+  
+  @ApiPropertyOptional()
+  @IsString()
+  @IsOptional()
+  promotionId: string;
   
   @ApiProperty({
     required: true,
@@ -52,4 +57,9 @@ export class CreateBookingDto {
   @IsDateString()
   @IsNotEmpty()
   dateTime: Date;
+  
+  @ApiProperty({ enum: PAYMENT_STATUS })
+  @IsEnum(PAYMENT_STATUS)
+  @IsNotEmpty()
+  paymentStatus: PAYMENT_STATUS;
 }

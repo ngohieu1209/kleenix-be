@@ -1,12 +1,13 @@
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany, Unique } from 'typeorm';
 import { BaseEntity } from './base.entity';
 import { AddressEntity } from './address.entity';
-import { BOOKING_STATUS } from '../../shared/enums/booking.enum';
+import { BOOKING_STATUS, PAYMENT_STATUS } from '../../shared/enums/booking.enum';
 import { PackageEntity } from './package.entity';
 import { BookingExtraServiceEntity } from './booking-extra-service.entity';
 import { AssignmentEntity } from './assignment.entity';
 import { BookingPackageEntity } from './booking-package.entity';
-// import { BookingPackageEntity } from './booking-package.entity';
+import { CustomerPromotionEntity } from './customer-promotion.entity';
+import { FeedbackEntity } from './feedback.entity';
 
 @Entity({
   name: 'booking',
@@ -47,6 +48,24 @@ export class BookingEntity extends BaseEntity {
   })
   status: BOOKING_STATUS;
   
+  @Column({
+    transformer: {
+      to(value: string) {
+        return value.toUpperCase();
+      },
+      from(value: string) {
+        // Do nothing
+        return value;
+      }
+    },
+    nullable: false,
+    type: 'enum',
+    enum: PAYMENT_STATUS,
+    enumName: 'PAYMENT_STATUS_ENUM',
+    name: 'payment_status'
+  })
+  paymentStatus: PAYMENT_STATUS;
+  
   // RELATION
   // -----------------------------------------------------------------------------
   
@@ -58,6 +77,12 @@ export class BookingEntity extends BaseEntity {
   
   @OneToMany(() => AssignmentEntity, (assignment) => assignment.booking)
   assignment: AssignmentEntity[]
+  
+  @OneToMany(() => CustomerPromotionEntity, (customerPromotion) => customerPromotion.booking)
+  customerPromotion: CustomerPromotionEntity[];
+  
+  @OneToMany(() => FeedbackEntity, (feedback) => feedback.booking)
+  feedback: FeedbackEntity[]
   
   @ManyToOne(() => AddressEntity, (address) => address.booking, {
     onDelete: 'SET NULL',

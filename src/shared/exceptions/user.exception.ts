@@ -43,4 +43,12 @@ export const userHttpErrors = {
     message: 'Nạp tiền thất bại',
     code: 'USER_00011'
   },
+  PROMOTION_CLAIMED: {
+    message: 'Bạn đã nhận mã khuyến mãi này rồi',
+    code: 'USER_00012'
+  },
+  KPAY_NOT_ENOUGH: {
+    message: 'Số dư KPay không đủ',
+    code: 'USER_00013'
+  },
 };

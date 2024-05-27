@@ -36,7 +36,12 @@ export class BookingRepository extends Repository<BookingEntity> {
   }
   
   async getBookingByCustomer(customerId: string, bookingId: string): Promise<BookingEntity> {
-    const booking = await this.repository.findOne({ where: { id: bookingId, address: { customer: {id: customerId}} } });
+    const booking = await this.repository.findOne(
+      { 
+        where: { id: bookingId, address: { customer: {id: customerId}} } ,
+        relations: ['customerPromotion']
+      },
+    );
     if (!booking) {
       throw new BaseException(ERROR.BOOKING_NOT_FOUND);
     }
@@ -52,6 +57,8 @@ export class BookingRepository extends Repository<BookingEntity> {
       .innerJoinAndSelect('package.service', 'service')
       .leftJoinAndSelect('booking.bookingExtraService', 'bookingExtraService')
       .leftJoinAndSelect('bookingExtraService.extraService', 'extraService')
+      .leftJoinAndSelect('booking.customerPromotion', 'customerPromotion')
+      .leftJoinAndSelect('customerPromotion.promotion', 'promotion')
       .where('address.customer.id = :customerId', { customerId });
       if (startDate && endDate) {
         query.andWhere('DATE(booking.dateTime) BETWEEN :startDate AND :endDate', {

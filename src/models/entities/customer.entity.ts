@@ -2,6 +2,8 @@ import { Column, Entity, JoinColumn, ManyToOne, OneToMany, Unique } from 'typeor
 import { BaseEntity } from './base.entity';
 import { AddressEntity } from './address.entity';
 import { RoleEntity } from './role.entity';
+import { CustomerPromotionEntity } from './customer-promotion.entity';
+import { FeedbackEntity } from './feedback.entity';
 
 @Entity({
   name: 'customer',
@@ -58,4 +60,10 @@ export class CustomerEntity extends BaseEntity {
   
   @OneToMany(() => AddressEntity, (address) => address.customer)
   address: AddressEntity[];
+  
+  @OneToMany(() => CustomerPromotionEntity, (customerPromotion) => customerPromotion.customer)
+  customerPromotion: CustomerPromotionEntity[];
+  
+  @OneToMany(() => FeedbackEntity, (feedback) => feedback.customer)
+  feedback: FeedbackEntity[]
 }

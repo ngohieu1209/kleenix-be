@@ -20,15 +20,13 @@ export class AssignmentEntity extends BaseEntity {
   @Column({ name: 'end_time' })
   endTime: Date;
   
-  @Column({ nullable: true })
-  ratting: number;
-  
   // RELATION
   // -----------------------------------------------------------------------------
 
   @ManyToOne(() => HouseWorkerEntity, (houseWorker) => houseWorker.assignment, {
     onDelete: 'CASCADE',
     orphanedRowAction: 'delete',
+    eager: true,
   })
   @JoinColumn({ 
     name: 'house_worker_id',
@@ -39,6 +37,7 @@ export class AssignmentEntity extends BaseEntity {
   @ManyToOne(() => BookingEntity, (booking) => booking.assignment, {
     onDelete: 'CASCADE',
     orphanedRowAction: 'delete',
+    eager: true,
   })
   @JoinColumn({ 
     name: 'booking_id',

@@ -12,3 +12,10 @@ export function convertPhoneToInternational(phoneNumber: string): string {
     return '+84' + phoneNumber;
   }
 }
+
+export function transformPoint(number: number): number {
+  const beforePoint = Math.floor(number / 10000);
+  const modPoint = Math.floor(beforePoint % 10);
+  const pointReceive = beforePoint - modPoint;
+  return pointReceive;
+}

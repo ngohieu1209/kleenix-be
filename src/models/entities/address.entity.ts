@@ -39,6 +39,7 @@ export class AddressEntity extends BaseEntity {
   @ManyToOne(() => CustomerEntity, (customer) => customer.address, {
     onDelete: 'CASCADE',
     orphanedRowAction: 'delete',
+    eager: true,
   })
   @JoinColumn({ 
     name: 'customer_id',
