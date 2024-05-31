@@ -148,10 +148,10 @@ export class AuthService {
     } catch (error) {
       if (error.name === 'TokenExpiredError') {
         payload = this.jwtService.decode(refreshToken) as JwtPayload;
-        await this.redisInstance.hdel(
-          `${CACHE_CONSTANT.SESSION_PREFIX}${payload.userId}`,
-          signatureAccessToken
-        );
+        // await this.redisInstance.hdel(
+        //   `${CACHE_CONSTANT.SESSION_PREFIX}${payload.userId}`,
+        //   signatureAccessToken
+        // );
 
         throw new BaseException(ERROR.REFRESH_TOKEN_EXPIRED);
       } else {

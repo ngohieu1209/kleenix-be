@@ -5,6 +5,7 @@ import { JwtDecodedData } from 'src/shared/decorators/auth.decorator';
 import { JwtPayload } from 'src/shared/dtos';
 import { HouseWorkerEntity } from 'src/models/entities';
 import { WorkerAccountService } from './account-worker.service';
+import { UpdateCustomerDto } from 'src/modules/customer/account/dto/update-user.dto';
 
 @Controller('house-worker')
 @ApiTags('House Worker | Account')
@@ -21,4 +22,16 @@ export class WorkerAccountController {
   ): Promise<HouseWorkerEntity> {
     return this.workerAccountService.getMe(data.userId);
   }
+  
+  @ApiOperation({
+    summary: 'update information user',
+  })
+  @Patch('edit')
+  async updateInformationCustomer(
+    @Body() updateCustomer: UpdateCustomerDto,
+    @JwtDecodedData() data: JwtPayload,
+  ): Promise<any> {
+    return this.workerAccountService.updateInformation(data.userId, updateCustomer);
+  }
+  
 }

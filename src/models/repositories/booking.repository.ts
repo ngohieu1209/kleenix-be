@@ -90,6 +90,8 @@ export class BookingRepository extends Repository<BookingEntity> {
       .innerJoinAndSelect('package.service', 'service')
       .leftJoinAndSelect('booking.bookingExtraService', 'bookingExtraService')
       .leftJoinAndSelect('bookingExtraService.extraService', 'extraService')
+      .leftJoinAndSelect('booking.customerPromotion', 'customerPromotion')
+      .leftJoinAndSelect('customerPromotion.promotion', 'promotion')
       .innerJoinAndSelect('address.customer', 'customer')
       if(search) {
         query.andWhere('customer.name LIKE :search', { search: `%${search}%` });

@@ -3,7 +3,7 @@ import { addMinutes } from 'date-fns';
 
 import _ from 'lodash';
 import { AssignmentEntity, BookingEntity } from 'src/models/entities';
-import { BookingRepository, CustomerRepository, HouseWorkerRepository } from 'src/models/repositories';
+import { AssignmentRepository, BookingRepository, CustomerRepository, HouseWorkerRepository } from 'src/models/repositories';
 import { FilterAdminBookingDto } from 'src/modules/admin/booking/dto/query-admin-booking.dto';
 import { BOOKING_STATUS } from 'src/shared/enums/booking.enum';
 import { ERROR } from 'src/shared/exceptions';
@@ -18,14 +18,21 @@ export class AssignmentService {
     private readonly bookingRepository: BookingRepository,
     private readonly houseWorkerRepository: HouseWorkerRepository,
     private readonly customerRepository: CustomerRepository,
+    private readonly assignmentRepository: AssignmentRepository,
     private readonly databaseUtilService: DatabaseUtilService,
     private readonly dataSource: DataSource,
   ) {}
   
   async getListBookingPending(houseWorkerId: string, filterAdminBooking: FilterAdminBookingDto) {
-    const listBookingPending = await this.bookingRepository.getListBooking(filterAdminBooking);
+    let listBooking = []
+    if(_.includes(filterAdminBooking.status, BOOKING_STATUS.PENDING)) {
+      listBooking = await this.bookingRepository.getListBooking(filterAdminBooking);
+    } else {
+      const assignment = await this.assignmentRepository.getAssignmentWithStatusByHouseWorker(houseWorkerId, filterAdminBooking);
+      listBooking = _.map(assignment, 'booking');
+    }
     // const listBookingPendingGroupByDate = _.groupBy(listBookingPending, 'dateTime');
-    return listBookingPending;
+    return listBooking;
   }
   
   async acceptBooking(houseWorkerId: string, bookingId: string) {
