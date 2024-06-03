@@ -27,6 +27,8 @@ export class BookingRepository extends Repository<BookingEntity> {
       .leftJoinAndSelect('booking.bookingExtraService', 'bookingExtraService')
       .leftJoinAndSelect('bookingExtraService.extraService', 'extraService')
       .innerJoinAndSelect('address.customer', 'customer')
+      .leftJoinAndSelect('booking.customerPromotion', 'customerPromotion')
+      .leftJoinAndSelect('customerPromotion.promotion', 'promotion')
       .where('booking.id = :bookingId', { bookingId })
       .getOne();
     if (!booking) {

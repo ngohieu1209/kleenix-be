@@ -10,6 +10,7 @@ import { ManageHouseWorkerService } from './house-worker.service';
 import { CreateHouseWorkerDto } from './dto/create-house-worker.dto';
 import { FilterHouseWorkerDto } from './dto/query-house-worker.dto';
 import { UpdateHouseWorkerDto } from './dto/update-house-worker.dto';
+import { FilterAdminBookingDto } from '../booking/dto/query-admin-booking.dto';
 
 @ApiTags('Admin | House Worker')
 @ApiBearerAuth()
@@ -36,6 +37,17 @@ export class ManageHouseWorkerController {
     @Param() paramHouseWorkerId: HouseWorkerIdDto, 
   ): Promise<HouseWorkerEntity> {
     return this.manageHouseWorkerService.getHouseWorker(paramHouseWorkerId.houseWorkerId);
+  }
+  
+  @ApiOperation({
+    summary: 'get list assignment house worker',
+  })
+  @Get('assignment/:houseWorkerId')
+  async getListAssignment(
+    @Param() paramHouseWorkerId: HouseWorkerIdDto, 
+    @Query() filterAdminBooking: FilterAdminBookingDto
+  ): Promise<any> {
+    return this.manageHouseWorkerService.getListAssignmentHouseWorker(paramHouseWorkerId.houseWorkerId, filterAdminBooking);
   }
   
   @ApiOperation({
