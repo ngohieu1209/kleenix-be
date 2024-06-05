@@ -22,7 +22,7 @@ export class UpdatePackageDto {
   @ApiPropertyOptional()
   @IsBoolean()
   @IsOptional()
-  @Transform(({ value }): boolean => value === 'true')
+  // @Transform(({ value }): boolean => value === 'true')
   activate: boolean;
   
   @ApiPropertyOptional()

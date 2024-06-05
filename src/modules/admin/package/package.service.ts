@@ -28,6 +28,7 @@ export class ManagePackageService {
   }
   
   async updatePackage(packageId: string, updatePackage: UpdatePackageDto): Promise<boolean> {
+    console.log('winter-updatePackage', updatePackage)
     const { affected } = await this.packageRepository.update({ id: packageId }, updatePackage);
     if(affected === 0) {
       throw new BaseException(ERROR.PACKAGE_NOT_EXIST);
