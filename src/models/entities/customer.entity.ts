@@ -4,6 +4,7 @@ import { AddressEntity } from './address.entity';
 import { RoleEntity } from './role.entity';
 import { CustomerPromotionEntity } from './customer-promotion.entity';
 import { FeedbackEntity } from './feedback.entity';
+import { NotificationEntity } from './notification.entity';
 
 @Entity({
   name: 'customer',
@@ -27,6 +28,11 @@ export class CustomerEntity extends BaseEntity {
   
   @Column({ length: 10, nullable: true, select: false })
   code: string;
+  
+  @Column({
+    nullable: true
+  })
+  avatar: string;
   
   @Column({
     name: 'k_pay',
@@ -66,4 +72,7 @@ export class CustomerEntity extends BaseEntity {
   
   @OneToMany(() => FeedbackEntity, (feedback) => feedback.customer)
   feedback: FeedbackEntity[]
+  
+  @OneToMany(() => NotificationEntity, (notification) => notification.customer)
+  notification: NotificationEntity[]
 }

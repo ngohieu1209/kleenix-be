@@ -28,7 +28,7 @@ export class FeedbackController {
   @ApiOperation({
     summary: 'Gửi feedback',
   })
-  @Post('')
+  @Post('new')
   async sendFeedback(
     @JwtDecodedData() data: JwtPayload,
     @Body() postFeedback: PostFeedbackDto

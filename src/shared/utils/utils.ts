@@ -19,3 +19,14 @@ export function transformPoint(number: number): number {
   const pointReceive = beforePoint - modPoint;
   return pointReceive;
 }
+
+export function getFirstEightChars(str: string): string {
+  return str.substring(0, 8);
+}
+
+export function fCurrency(value: number) {
+  return value.toLocaleString('vi-VN', {
+    style: 'currency',
+    currency: 'VND',
+  })
+}

@@ -1,12 +1,15 @@
 import { Body, Controller, Get, ParseFilePipe, Patch, Post, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { ApiBearerAuth, ApiConsumes, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { JwtDecodedData } from 'src/shared/decorators/auth.decorator';
+import { JwtDecodedData, Public } from 'src/shared/decorators/auth.decorator';
 
 import { CustomerAccountService } from './account.service';
 import { JwtPayload } from 'src/shared/dtos';
 import { CustomerEntity } from 'src/models/entities';
 import { UpdateCustomerDto } from './dto/update-user.dto';
 import { PaymentDto } from './dto/payment.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { ImageFileValidator } from 'src/shared/validators/image-file.validator';
+import { PhoneNumberDto } from '../auth/dto/phone-number.dto';
 
 @Controller('customer')
 @ApiTags('Customer | Account')
@@ -27,12 +30,20 @@ export class CustomerAccountController {
   @ApiOperation({
     summary: 'update information user',
   })
+  @ApiConsumes('multipart/form-data')
+  @UseInterceptors(FileInterceptor('avatar'))
   @Patch('edit')
   async updateInformationCustomer(
-    @Body() updateCustomer: UpdateCustomerDto,
     @JwtDecodedData() data: JwtPayload,
+    @Body() updateCustomer: UpdateCustomerDto,
+    @UploadedFile(
+      new ParseFilePipe({
+        validators: [new ImageFileValidator({})],
+        fileIsRequired: false
+      }),
+    ) avatar?: Express.Multer.File,
   ): Promise<any> {
-    return this.customerAccountService.updateInformation(data.userId, updateCustomer);
+    return this.customerAccountService.updateInformation(data.userId, updateCustomer, avatar);
   }
   
   @ApiOperation({

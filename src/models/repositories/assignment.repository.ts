@@ -90,4 +90,12 @@ export class AssignmentRepository extends Repository<AssignmentEntity> {
       const assignments = await query.getMany();
       return transformToPlain<AssignmentEntity[]>(assignments); 
   }
+  
+  async getAssignmentByBooking(bookingId: string) {
+    const assignment = await this.repository.findOne({ where: { booking: { id: bookingId } } });
+    if (!assignment) {
+      return null;
+    }
+    return transformToPlain<AssignmentEntity>(assignment);
+  }
 }

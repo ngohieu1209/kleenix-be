@@ -53,4 +53,17 @@ export class CustomerRepository extends Repository<CustomerEntity> {
     }
     return transformToPlain<CustomerEntity>(user);
   }
+  
+  async amountCustomer(): Promise<number> {
+    return await this.count({ where: { verify: true }});
+  }
+  
+  async getTopCustomersSpend(): Promise<any> {
+    const customers = await this.createQueryBuilder('customer')
+      .where('customer.usedPay > 0')
+      .orderBy('customer.usedPay', 'DESC')
+      .limit(3)
+      .getMany();
+    return customers;
+  }
 }

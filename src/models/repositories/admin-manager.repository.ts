@@ -20,6 +20,11 @@ export class AdminManagerRepository extends Repository<AdminManagerEntity> {
     return count > 0;
   }
   
+  async adminIdsExist() {
+    const adminIds = await this.find({ select: ['id'] });
+    return adminIds.map(admin => admin.id);
+  }
+  
   async getAdminManagerWithPassword(username: string): Promise<AdminManagerEntity> {
     const user = await this.createQueryBuilder('adminManager')
       .andWhere('adminManager.username = :username', { username })

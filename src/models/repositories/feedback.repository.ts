@@ -38,13 +38,21 @@ export class FeedbackRepository extends Repository<FeedbackEntity> {
       .innerJoinAndSelect('feedback.booking', 'booking')
       .innerJoinAndSelect('feedback.customer', 'customer')
       .leftJoinAndSelect('booking.assignment', 'assignment')
+      .innerJoinAndSelect('booking.bookingPackage', 'bookingPackage')
+      .innerJoinAndSelect('bookingPackage.package', 'package')
+      .innerJoinAndSelect('package.service', 'service')
+      .leftJoinAndSelect('booking.bookingExtraService', 'bookingExtraService')
+      .leftJoinAndSelect('bookingExtraService.extraService', 'extraService')
       .leftJoinAndSelect('assignment.houseWorker', 'houseWorker')
-      .leftJoinAndSelect('booking.address', 'address')
       .andWhere('feedback.id = :feedbackId', { feedbackId });
     const feedback = await query.getOne();
     if(!feedback) {
       throw new BaseException(ERROR.FEEDBACK_NOT_EXIST);
     }
     return transformToPlain<FeedbackEntity>(feedback);
+  }
+  
+  async amountFeedback() : Promise<number> {
+    return await this.count();
   }
 }

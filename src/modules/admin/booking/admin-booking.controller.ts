@@ -43,7 +43,7 @@ export class ManageBookingController {
   async updateStatusBooking(
     @Param() paramBookingId: BookingIdDto, 
     @Body() updateStatusBooking: UpdateStatusBookingDto,
-  ): Promise<boolean> {
+  ): Promise<any> {
     return this.manageBookingService.updateStatusBooking(paramBookingId.bookingId, updateStatusBooking);
   }
 }

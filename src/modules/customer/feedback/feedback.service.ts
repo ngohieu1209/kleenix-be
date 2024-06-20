@@ -1,12 +1,15 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 
 import _ from 'lodash';
-import { FeedbackEntity } from 'src/models/entities';
-import { CustomerRepository, BookingRepository, FeedbackRepository } from 'src/models/repositories';
+import { FeedbackEntity, NotificationEntity } from 'src/models/entities';
+import { CustomerRepository, BookingRepository, FeedbackRepository, NotificationRepository } from 'src/models/repositories';
+import { NotificationGateway } from 'src/modules/notification/notification.gateway';
 import { BOOKING_STATUS } from 'src/shared/enums/booking.enum';
+import { NOTIFICATION_TYPE } from 'src/shared/enums/notification.enum';
 import { ERROR } from 'src/shared/exceptions';
 import { BaseException } from 'src/shared/filters/exception.filter';
 import { DatabaseUtilService } from 'src/shared/services/database-util.service';
+import { getFirstEightChars } from 'src/shared/utils/utils';
 import { DataSource } from 'typeorm';
 import { PostFeedbackDto } from './dto/post-feedback.dto';
 
@@ -16,6 +19,8 @@ export class FeedbackService {
     private readonly customerRepository: CustomerRepository,
     private readonly feedbackRepository: FeedbackRepository,
     private readonly bookingRepository: BookingRepository,
+    private readonly notificationRepository: NotificationRepository,
+    private readonly notificationGateway: NotificationGateway,
   ) {}
 
   async getFeedback(customerId: string, bookingId: string): Promise<any> {
@@ -39,6 +44,13 @@ export class FeedbackService {
     newFeedback.booking = booking;
     newFeedback.feedback = feedback;
     newFeedback.rating = rating;
-    return await this.feedbackRepository.save(newFeedback);
+    const saveFeedback = await this.feedbackRepository.save(newFeedback);
+    const newNotification = new NotificationEntity();
+    newNotification.booking = booking;
+    newNotification.body = `Khách hàng ${customer.name} đã gửi phản hồi cho booking #${getFirstEightChars(booking.id)}`;
+    newNotification.type = NOTIFICATION_TYPE.FEEDBACK;
+    await this.notificationRepository.save(newNotification);
+    await this.notificationGateway.refreshNotificationAdmin();
+    return saveFeedback;
   }
 }

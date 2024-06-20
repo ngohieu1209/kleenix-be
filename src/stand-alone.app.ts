@@ -2,13 +2,23 @@ import { NestFactory } from '@nestjs/core';
 
 import { AppModule } from './app.module';
 import { HealthCheckController } from './modules/health-check/health-check.controller';
-import { HealthCheckModule } from './modules/health-check/health-check.module';
+import { CronModule } from './modules/cron/cron.module';
+import { DefaultCronService } from './modules/cron/default.cron.service';
+import { Module } from '@nestjs/common';
+import { NotificationGateway } from './modules/notification/notification.gateway';
+import { Server, Socket } from 'socket.io';
+
+@Module({
+  imports: [AppModule, CronModule],
+})
+export class MainModule {}
 
 async function bootstrap() {
-  const app = await NestFactory.createApplicationContext(AppModule);
-  const healthCheck = app.select(HealthCheckModule).get(HealthCheckController);
-  console.info(healthCheck.heathCheck());
-  app.close();
+  try {
+    const app = await NestFactory.createApplicationContext(MainModule);
+  } catch (error) {
+    console.log('Error-StandAlone: ', error);
+  }
 }
 
 bootstrap();

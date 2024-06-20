@@ -8,6 +8,7 @@ import { AssignmentEntity } from './assignment.entity';
 import { BookingPackageEntity } from './booking-package.entity';
 import { CustomerPromotionEntity } from './customer-promotion.entity';
 import { FeedbackEntity } from './feedback.entity';
+import { NotificationEntity } from './notification.entity';
 
 @Entity({
   name: 'booking',
@@ -83,6 +84,9 @@ export class BookingEntity extends BaseEntity {
   
   @OneToMany(() => FeedbackEntity, (feedback) => feedback.booking)
   feedback: FeedbackEntity[]
+  
+  @OneToMany(() => NotificationEntity, (notification) => notification.booking)
+  notification: NotificationEntity[]
   
   @ManyToOne(() => AddressEntity, (address) => address.booking, {
     onDelete: 'SET NULL',

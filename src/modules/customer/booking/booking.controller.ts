@@ -58,4 +58,14 @@ export class BookingController {
   ): Promise<any> {
     return this.bookingService.getBooking(data.userId, paramBooking.bookingId);
   }
+  
+  @ApiOperation({
+    summary: 'list booking',
+  })
+  @Get('test')
+  async test(
+    @JwtDecodedData() data: JwtPayload,
+  ): Promise<any> {
+    return this.bookingService.expiredBooking();
+  }
 }

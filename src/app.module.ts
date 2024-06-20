@@ -30,6 +30,7 @@ import * as HouseWorker from './modules/house-worker'
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import stripeConfig from './shared/configs/stripe.config';
+import { NotificationModule } from './modules/notification/notification.module';
 
 const UserModules = Object.values(Customer);
 const AdminModules = Object.values(Admin);
@@ -82,10 +83,11 @@ const HouseWorkerModules = Object.values(HouseWorker);
     SharedModule,
     DatabaseCommonModule,
     HealthCheckModule,
-    CronModule,
+    // CronModule,
     ...UserModules,
     ...AdminModules,
     ...HouseWorkerModules,
+    NotificationModule
   ],
   providers: [
     {

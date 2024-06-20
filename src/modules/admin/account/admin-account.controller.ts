@@ -21,4 +21,14 @@ export class AdminAccountController {
   ): Promise<AdminManagerEntity> {
     return this.adminAccountService.getMe(data.userId);
   }
+  
+  @ApiOperation({
+    summary: 'overview',
+  })
+  @Get('overview')
+  async Overview(
+    @JwtDecodedData() data: JwtPayload
+  ): Promise<any> {
+    return this.adminAccountService.getOverview(data.userId);
+  }
 }

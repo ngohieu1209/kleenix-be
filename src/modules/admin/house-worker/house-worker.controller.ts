@@ -1,5 +1,5 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, Query } from '@nestjs/common';
-import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { Body, Controller, Delete, Get, Param, ParseFilePipe, Patch, Post, Query, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { ApiBearerAuth, ApiConsumes, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Role } from 'src/shared/enums/role.enum';
 import { Roles } from 'src/shared/decorators/auth.decorator';
 
@@ -11,6 +11,8 @@ import { CreateHouseWorkerDto } from './dto/create-house-worker.dto';
 import { FilterHouseWorkerDto } from './dto/query-house-worker.dto';
 import { UpdateHouseWorkerDto } from './dto/update-house-worker.dto';
 import { FilterAdminBookingDto } from '../booking/dto/query-admin-booking.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { ImageFileValidator } from 'src/shared/validators/image-file.validator';
 
 @ApiTags('Admin | House Worker')
 @ApiBearerAuth()
@@ -22,11 +24,19 @@ export class ManageHouseWorkerController {
   @ApiOperation({
     summary: 'Create a house worker',
   })
+  @ApiConsumes('multipart/form-data')
+  @UseInterceptors(FileInterceptor('avatar'))
   @Post('new')
   async createHouseWorker(
     @Body() createHouseWorker: CreateHouseWorkerDto, 
+    @UploadedFile(
+      new ParseFilePipe({
+        validators: [new ImageFileValidator({})],
+        fileIsRequired: false
+      }),
+    ) avatar?: Express.Multer.File,
   ): Promise<HouseWorkerEntity> {
-    return this.manageHouseWorkerService.createHouseWorker(createHouseWorker);
+    return this.manageHouseWorkerService.createHouseWorker(createHouseWorker, avatar);
   }
   
   @ApiOperation({
@@ -63,12 +73,20 @@ export class ManageHouseWorkerController {
   @ApiOperation({
     summary: 'update information house worker',
   })
+  @ApiConsumes('multipart/form-data')
+  @UseInterceptors(FileInterceptor('avatar'))
   @Patch(':houseWorkerId')
   async updateInformationHouseWorker(
     @Param() paramHouseWorkerId: HouseWorkerIdDto, 
     @Body() updateHouseWorker: UpdateHouseWorkerDto,
-  ): Promise<boolean> {
-    return this.manageHouseWorkerService.updateHouseWorker(paramHouseWorkerId.houseWorkerId, updateHouseWorker);
+    @UploadedFile(
+      new ParseFilePipe({
+        validators: [new ImageFileValidator({})],
+        fileIsRequired: false
+      }),
+    ) avatar?: Express.Multer.File,
+  ): Promise<any> {
+    return this.manageHouseWorkerService.updateHouseWorker(paramHouseWorkerId.houseWorkerId, updateHouseWorker, avatar);
   }
   
   @ApiOperation({

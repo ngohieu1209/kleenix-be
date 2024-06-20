@@ -16,6 +16,9 @@ import { RefreshTokenRequestDto, RefreshTokenResponseDto } from 'src/shared/dtos
 import { RegisterRequestDto, RegisterResponseDto } from './dto/register.dto';
 import { ChangePasswordDto } from './dto/password.dto';
 import { VerifyPhoneNumberDto } from './dto/verify.dto';
+import { PhoneNumberDto } from './dto/phone-number.dto';
+import { VerifyCodeForgetDto } from './dto/verify-forget-password.dto';
+import { ResetPasswordDto } from './dto/reset-password.dto';
 
 @Controller('auth')
 @ApiTags('Auth')
@@ -127,4 +130,49 @@ export class AuthController {
       logoutResult,
     };
   }
+  
+  @ApiOperation({
+    summary: 'check phone number exist',
+  })
+  @Post('check-phone-exist')
+  @Public()
+  async checkPhoneExist(
+    @Body() bodyPhoneNumber: PhoneNumberDto
+  ): Promise<any> {
+    return this.authService.checkPhoneExist(bodyPhoneNumber.phoneNumber);
+  }
+  
+  @ApiOperation({
+    summary: 'verify code forget password',
+  })
+  @Post('verify-code-forgot-password')
+  @Public()
+  async verifyCodeForgetPassword(
+    @Body() verifyCode: VerifyCodeForgetDto
+  ): Promise<any> {
+    return this.authService.verifyCodeForgetPassword(verifyCode);
+  }
+  
+  @ApiOperation({
+    summary: 'reset password',
+  })
+  @Post('reset-password')
+  @Public()
+  async resetPassword(
+    @Body() bodyResetPassword: ResetPasswordDto
+  ): Promise<any> {
+    return this.authService.resetPassword(bodyResetPassword);
+  }
+  
+  @ApiOperation({
+    summary: 'Resend sms code forgot password',
+  })
+  @Post('/resend-sms-forgot-password')
+  @Public()
+  async resendSmsForgotPassword(
+    @Body() data: PhoneNumberDto
+  ) {
+    return this.authService.resendOTPForgotPassword(data.phoneNumber);
+  }
+
 }

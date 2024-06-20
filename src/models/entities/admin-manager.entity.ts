@@ -3,6 +3,7 @@ import { BaseEntity } from './base.entity';
 import { AddressEntity } from './address.entity';
 import { RoleEntity } from './role.entity';
 import { HouseWorkerEntity } from './house-worker.entity';
+import { NotificationEntity } from './notification.entity';
 
 @Entity({
   name: 'admin_manager',

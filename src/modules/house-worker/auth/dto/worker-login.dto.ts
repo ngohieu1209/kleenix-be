@@ -13,7 +13,6 @@ export class WorkerLoginRequestDto {
     required: true,
     example: '123456',
   })
-  @MinLength(6)
   @IsString()
   @IsNotEmpty()
   password: string;

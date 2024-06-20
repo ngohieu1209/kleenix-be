@@ -25,6 +25,8 @@ import { CustomerEntity } from 'src/models/entities';
 import { DatabaseUtilService } from 'src/shared/services/database-util.service';
 import { DataSource } from 'typeorm';
 import { SmsService } from 'src/providers/sms/sms.service';
+import { VerifyCodeForgetDto } from './dto/verify-forget-password.dto';
+import { ResetPasswordDto } from './dto/reset-password.dto';
 
 @Injectable()
 export class AuthService {
@@ -243,6 +245,80 @@ export class AuthService {
     }
     if(customer.verify) {
       throw new BaseException(ERROR.USER_VERIFIED);
+    }
+    const codeRandom = RandomString.generate({
+      length: 4,
+      charset: 'numeric'
+    });
+    const { affected } = await this.customerRepository.update({ id: customer.id }, {
+      code: codeRandom
+    });
+    if(affected <= 0) {
+      throw new BaseException(ERROR.UPDATE_FAIL);
+    }
+    await this.smsService.initiatePhoneNumberVerification(customer.phoneNumber, codeRandom);
+    return true;
+  }
+  
+  async checkPhoneExist(phoneNumber: string): Promise<any> {
+    const customer = await this.customerRepository.getCustomerWithPassword('84', phoneNumber);
+    if(!customer.verify) {
+      throw new BaseException(ERROR.ACCOUNT_NOT_VERIFIED);
+    }
+    const codeRandom = RandomString.generate({
+      length: 4,
+      charset: 'numeric'
+    });
+    const { affected } = await this.customerRepository.update({ id: customer.id }, {
+      code: codeRandom
+    });
+    if(affected <= 0) {
+      throw new BaseException(ERROR.UPDATE_FAIL);
+    }
+    await this.smsService.initiatePhoneNumberVerification(customer.phoneNumber, codeRandom);
+    return true;
+  }
+  
+  async verifyCodeForgetPassword(verifyCode: VerifyCodeForgetDto): Promise<any> {
+    const { code, phoneNumber } = verifyCode;
+    const customer = await this.customerRepository.createQueryBuilder('customer')
+    .where('customer.phoneNumber = :phoneNumber', { phoneNumber })
+    .addSelect('customer.code')
+    .getOne();
+    
+    if(customer.code !== code) {
+      throw new BaseException(ERROR.INVALID_VERIFY_CODE);
+    }
+    return true
+  }
+  
+  async resetPassword(payload: ResetPasswordDto): Promise<any> {
+    const { phoneNumber, newPassword, code } = payload;
+    const customer = await this.customerRepository.createQueryBuilder('customer')
+    .where('customer.phoneNumber = :phoneNumber', { phoneNumber })
+    .andWhere('customer.code = :code', { code })
+    .addSelect('customer.password')
+    .getOne();
+    if(!customer) {
+      throw new BaseException(ERROR.USER_NOT_EXIST);
+    }
+    const hashPassword = await hash(
+      newPassword,
+      COMMON_CONSTANT.BCRYPT_SALT_ROUND
+    );
+    const { affected } = await this.customerRepository.update({ id: customer.id }, {
+      password: hashPassword
+    })
+    return affected > 0;
+  }
+  
+  async resendOTPForgotPassword(phoneNumber: string) {
+    const customer = await this.customerRepository.createQueryBuilder('customer')
+      .where('customer.phoneNumber = :phoneNumber', { phoneNumber })
+      .addSelect('customer.code')
+      .getOne();
+    if(!customer) {
+      throw new BaseException(ERROR.USER_NOT_EXIST);
     }
     const codeRandom = RandomString.generate({
       length: 4,

@@ -3,6 +3,7 @@ import { BaseEntity } from './base.entity';
 import { GENDER } from '../../shared/enums/gender.enum';
 import { AdminManagerEntity } from './admin-manager.entity';
 import { AssignmentEntity } from './assignment.entity';
+import { NotificationEntity } from './notification.entity';
 
 @Entity({
   name: 'house_worker',
@@ -20,6 +21,11 @@ export class HouseWorkerEntity extends BaseEntity {
   
   @Column()
   age: number
+  
+  @Column({
+    nullable: true
+  })
+  avatar: string;
   
   @Column({
     transformer: {
@@ -43,6 +49,9 @@ export class HouseWorkerEntity extends BaseEntity {
   
   @OneToMany(() => AssignmentEntity, (assignment) => assignment.houseWorker)
   assignment: AssignmentEntity[]
+  
+  @OneToMany(() => NotificationEntity, (notification) => notification.houseWorker)
+  notification: NotificationEntity[]
   
   @ManyToOne(() => AdminManagerEntity, (adminManager) => adminManager.houseWorker, {
     onDelete: 'SET NULL',

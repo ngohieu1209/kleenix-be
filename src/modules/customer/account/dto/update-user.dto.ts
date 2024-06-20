@@ -11,7 +11,7 @@ export class UpdateCustomerDto {
   @ApiPropertyOptional()
   @IsString()
   @IsOptional()
-  @Matches(/^\d{6,12}$/, { message: 'phoneNumber phải là một chuỗi chữ số có độ dài từ 6 - 12 số' })
+  @Matches(/^\d{9,10}$/, { message: 'phoneNumber phải là một chuỗi chữ số có độ dài từ 9 - 10 số' })
   phoneNumber: string;
   
   @ApiPropertyOptional()
