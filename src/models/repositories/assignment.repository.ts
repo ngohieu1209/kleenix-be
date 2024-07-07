@@ -98,4 +98,17 @@ export class AssignmentRepository extends Repository<AssignmentEntity> {
     }
     return transformToPlain<AssignmentEntity>(assignment);
   }
+  
+  async checkWorkSchedules(houseWorkerId: string, startTime: Date, endTime: Date) {
+    const query = this.createQueryBuilder('assignment')
+      .innerJoin('assignment.houseWorker', 'houseWorker')
+      .where('houseWorker.id = :houseWorkerId', { houseWorkerId })
+      .andWhere('((:startTime BETWEEN assignment.startTime AND assignment.endTime) OR (:endTime BETWEEN assignment.startTime AND assignment.endTime))', {
+        startTime,
+        endTime,
+      })
+      
+    const count = await query.getCount();
+    return count > 0;
+  }
 }

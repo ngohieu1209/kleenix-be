@@ -11,7 +11,6 @@ import { AssignmentService } from './assignment.service';
 @Controller('house-worker/assignment')
 export class AssignmentController {
   constructor(private readonly assignmentService: AssignmentService) { }
-  // TODO: danh sách các list booking đang pending - (DONE - chưa ghép)
   @ApiOperation({
     summary: 'Danh sách tất cả các list booking đang pending',
   })
@@ -23,7 +22,6 @@ export class AssignmentController {
     return this.assignmentService.getListBookingPending(data.userId, filterAdminBooking);
   }
   
-  // TODO: nhận đơn booking - (DONE - chưa ghép)
   @ApiOperation({
     summary: 'Nhận đơn booking',
   })

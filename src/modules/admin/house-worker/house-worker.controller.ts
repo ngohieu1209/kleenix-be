@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, ParseFilePipe, Patch, Post, Query, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, ParseFilePipe, Patch, Post, Query, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { ApiBearerAuth, ApiConsumes, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Role } from 'src/shared/enums/role.enum';
 import { Roles } from 'src/shared/decorators/auth.decorator';
@@ -13,6 +13,7 @@ import { UpdateHouseWorkerDto } from './dto/update-house-worker.dto';
 import { FilterAdminBookingDto } from '../booking/dto/query-admin-booking.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ImageFileValidator } from 'src/shared/validators/image-file.validator';
+import { ResetPasswordWorkerDto } from './dto/reset-password-worker.dto';
 
 @ApiTags('Admin | House Worker')
 @ApiBearerAuth()
@@ -97,5 +98,16 @@ export class ManageHouseWorkerController {
     @Param() paramHouseWorkerId: HouseWorkerIdDto, 
   ): Promise<boolean> {
     return this.manageHouseWorkerService.deleteHouseWorker(paramHouseWorkerId.houseWorkerId);
+  }
+  
+  @ApiOperation({
+    summary: 'Reset password',
+  })
+  @Post('reset-password')
+  @HttpCode(HttpStatus.OK)
+  resetPasswordUser(
+    @Body() resetPasswordWorker: ResetPasswordWorkerDto,
+  ): Promise<any> {
+    return this.manageHouseWorkerService.resetPasswordHouseWorker(resetPasswordWorker);
   }
 }

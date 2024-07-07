@@ -62,7 +62,7 @@ export class ManagePromotionService {
   }
   
   async deletePromotion(promotionId: string): Promise<boolean> {
-    const { affected } = await this.promotionRepository.softDelete({ id: promotionId });
+    const { affected } = await this.promotionRepository.delete({ id: promotionId });
     if(affected === 0) {
       throw new BaseException(ERROR.PROMOTION_NOT_EXIST);
     }

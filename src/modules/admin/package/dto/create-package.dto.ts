@@ -1,6 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { IsNotEmpty, IsNumber, IsOptional, IsString, MinLength } from 'class-validator';
+import { IsBoolean, IsNotEmpty, IsNumber, IsOptional, IsString, MinLength } from 'class-validator';
 
 export class CreatePackageDto {
   @ApiPropertyOptional()
@@ -31,6 +31,12 @@ export class CreatePackageDto {
   @IsNotEmpty()
   @Type(() => Number)
   price: number;
+  
+  @ApiPropertyOptional()
+  @IsBoolean()
+  @IsOptional()
+  // @Transform(({ value }): boolean => value === 'true')
+  activate: boolean;
   
   @ApiProperty({
     required: true,

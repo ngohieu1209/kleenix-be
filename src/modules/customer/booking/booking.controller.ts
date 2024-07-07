@@ -66,6 +66,6 @@ export class BookingController {
   async test(
     @JwtDecodedData() data: JwtPayload,
   ): Promise<any> {
-    return this.bookingService.expiredBooking();
+    return this.bookingService.test();
   }
 }

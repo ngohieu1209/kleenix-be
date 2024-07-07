@@ -23,4 +23,8 @@ export const bookingHttpErrors = {
     message: 'Lịch đặt chưa được chấp nhận',
     code: "BOOKING_00006",
   },
+  ASSIGNMENT_DUPLICATE_SCHEDULE: {
+    message: 'Thời gian làm việc đã trùng lịch với lịch khác',
+    code: "BOOKING_00007",
+  }
 };

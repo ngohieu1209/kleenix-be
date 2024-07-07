@@ -36,10 +36,9 @@ export class CustomerPromotionEntity extends BaseEntity {
   customer: CustomerEntity;
   
   @ManyToOne(() => PromotionEntity, (promotion) => promotion.customerPromotion, {
-    onDelete: 'SET NULL',
-    orphanedRowAction: 'nullify',
+    onDelete: 'CASCADE',
+    orphanedRowAction: 'delete',
     eager: true,
-    nullable: true,
   })
   @JoinColumn({ 
     name: 'promotion_id',

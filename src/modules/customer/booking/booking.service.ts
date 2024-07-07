@@ -2,7 +2,7 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 
 import _ from 'lodash';
 import { BookingEntity, BookingExtraServiceEntity, BookingPackageEntity, CustomerEntity, CustomerPromotionEntity, ExtraServiceEntity, NotificationEntity, PackageEntity } from 'src/models/entities';
-import { AddressRepository, BookingRepository, CustomerPromotionRepository, CustomerRepository } from 'src/models/repositories';
+import { AddressRepository, AssignmentRepository, BookingRepository, CustomerPromotionRepository, CustomerRepository } from 'src/models/repositories';
 import { NotificationGateway } from 'src/modules/notification/notification.gateway';
 import { BOOKING_STATUS, PAYMENT_STATUS } from 'src/shared/enums/booking.enum';
 import { NOTIFICATION_TYPE } from 'src/shared/enums/notification.enum';
@@ -19,6 +19,7 @@ export class BookingService {
   constructor(
     private readonly customerRepository: CustomerRepository,
     private readonly bookingRepository: BookingRepository,
+    private readonly assignmentRepository: AssignmentRepository,
     private readonly notificationGateway: NotificationGateway,
     private readonly customerPromotionRepository: CustomerPromotionRepository,
     private readonly addressRepository: AddressRepository,
@@ -221,5 +222,10 @@ export class BookingService {
       console.log('expired-booking-error: ', error);
       throw new BadRequestException(error.message);
     }
+  }
+  
+  async test() {
+    const booking = await this.assignmentRepository.checkWorkSchedules('324d88ca-c4b8-4374-a3b1-cb41928d2a3c', new Date('2024-06-25T10:38:37.787Z'), new Date('2024-06-25T10:38:37.787Z'));
+    return booking;
   }
 }

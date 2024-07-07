@@ -29,8 +29,10 @@ export class ManageBookingService {
   }
   
   async getBooking(bookingId: string) {
+    let assignment = null;
     const booking = await this.bookingRepository.getBookingById(bookingId);
-    return booking;
+    assignment = await this.assignmentRepository.getAssignmentByBooking(booking.id);
+    return _.assign(booking, { assignment });
   }
   
   async updateStatusBooking(bookingId: string, updateStatusBooking: UpdateStatusBookingDto) {

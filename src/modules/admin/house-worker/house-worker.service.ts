@@ -12,6 +12,7 @@ import { UpdateHouseWorkerDto } from './dto/update-house-worker.dto';
 import { FilterHouseWorkerDto } from './dto/query-house-worker.dto';
 import { FilterAdminBookingDto } from '../booking/dto/query-admin-booking.dto';
 import { UploadLocalService } from 'src/providers/upload/local.service';
+import { ResetPasswordWorkerDto } from './dto/reset-password-worker.dto';
 
 @Injectable()
 export class ManageHouseWorkerService {
@@ -81,5 +82,18 @@ export class ManageHouseWorkerService {
   async getListAssignmentHouseWorker(houseWorkerId: string, filterAdminBooking: FilterAdminBookingDto) {
     const assignment = await this.assignmentRepository.getAssignmentWithStatusByHouseWorker(houseWorkerId, filterAdminBooking);
     return assignment;
+  }
+  
+  async resetPasswordHouseWorker(resetPassword: ResetPasswordWorkerDto) {
+    const { houseWorkerId, newPassword } = resetPassword;
+    const houseWorker = await this.houseWorkerRepository.getHouseWorkerByIdWithPassword(houseWorkerId);
+    const hashPassword = await hash(
+      newPassword,
+      COMMON_CONSTANT.BCRYPT_SALT_ROUND
+    );
+    const { affected } = await this.houseWorkerRepository.update({ id: houseWorker.id }, {
+      password: hashPassword
+    })
+    return affected > 0;
   }
 }

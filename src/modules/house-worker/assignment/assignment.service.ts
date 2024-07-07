@@ -50,6 +50,10 @@ export class AssignmentService {
       const result = await this.databaseUtilService.executeTransaction(
         this.dataSource,
         async (queryRunner) => {
+          const checkSchedules = await this.assignmentRepository.checkWorkSchedules(houseWorkerId, booking.dateTime, addMinutes(booking.dateTime, booking.duration));
+          if(checkSchedules) {
+            throw new BaseException(ERROR.ASSIGNMENT_DUPLICATE_SCHEDULE);
+          }
           const newAssignment = new AssignmentEntity();
           newAssignment.booking = booking;
           newAssignment.houseWorker = houseWorker;
