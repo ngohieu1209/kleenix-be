@@ -26,5 +26,13 @@ export const bookingHttpErrors = {
   ASSIGNMENT_DUPLICATE_SCHEDULE: {
     message: 'Thời gian làm việc đã trùng lịch với lịch khác',
     code: "BOOKING_00007",
-  }
+  },
+  EVIDENCE_REQUIRED: {
+    message: 'Cần chụp minh chứng',
+    code: "BOOKING_00008",
+  },
+  ASSIGNMENT_NOT_FOUND: {
+    message: 'Không tìm thấy công việc',
+    code: "BOOKING_00009",
+  },
 };

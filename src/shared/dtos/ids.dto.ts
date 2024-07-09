@@ -50,6 +50,13 @@ export class BookingIdDto {
   bookingId: string;
 }
 
+export class AssignmentIdDto {
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  assignmentId: string;
+}
+
 export class PromotionIdDto {
   @ApiProperty()
   @IsString()

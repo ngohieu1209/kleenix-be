@@ -63,6 +63,7 @@ export class BookingRepository extends Repository<BookingEntity> {
       .leftJoinAndSelect('bookingExtraService.extraService', 'extraService')
       .leftJoinAndSelect('booking.customerPromotion', 'customerPromotion')
       .leftJoinAndSelect('customerPromotion.promotion', 'promotion')
+      .leftJoinAndSelect('booking.assignment', 'assignment')
       .where('address.customer.id = :customerId', { customerId });
       if (startDate && endDate) {
         query.andWhere('DATE(booking.dateTime) BETWEEN :startDate AND :endDate', {

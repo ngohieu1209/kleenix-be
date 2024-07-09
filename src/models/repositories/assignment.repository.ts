@@ -18,6 +18,27 @@ export class AssignmentRepository extends Repository<AssignmentEntity> {
   ) {
     super(repository.target, repository.manager, repository.queryRunner);
   }
+  
+  async getAssignmentById(assignmentId: string) {
+    const query = this.repository.createQueryBuilder('assignment')
+      .innerJoinAndSelect('assignment.booking', 'booking')
+      .innerJoinAndSelect('booking.address', 'address')
+      .innerJoinAndSelect('booking.bookingPackage', 'bookingPackage')
+      .innerJoinAndSelect('bookingPackage.package', 'package')
+      .innerJoinAndSelect('package.service', 'service')
+      .leftJoinAndSelect('booking.bookingExtraService', 'bookingExtraService')
+      .leftJoinAndSelect('bookingExtraService.extraService', 'extraService')
+      .innerJoinAndSelect('address.customer', 'customer')
+      .innerJoinAndSelect('assignment.houseWorker', 'houseWorker')
+      .leftJoinAndSelect('booking.customerPromotion', 'customerPromotion')
+      .leftJoinAndSelect('customerPromotion.promotion', 'promotion')
+      .andWhere('assignment.id = :assignmentId', { assignmentId });
+    const assignment = await query.getOne();
+    if (!assignment) {
+      throw new BaseException(ERROR.ASSIGNMENT_NOT_FOUND);
+    }
+    return transformToPlain<AssignmentEntity>(assignment);
+  }
 
   async getAssignmentByHouseWorker(houseWorkerId: string, querySchedule: QueryScheduleDto) {
     const { startDate, endDate } = querySchedule;

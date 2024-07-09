@@ -179,7 +179,8 @@ export class BookingService {
   
   async getListBooking(customerId: string, queryBooking: QueryBookingDto) {
     const bookings = await this.bookingRepository.getListBookingByCustomer(customerId, queryBooking);
-    return bookings;
+    const result = _.orderBy(bookings, ['dateTime'], ['desc']);
+    return result;
   }
   
   async getBooking(customerId: string, bookingId: string) {

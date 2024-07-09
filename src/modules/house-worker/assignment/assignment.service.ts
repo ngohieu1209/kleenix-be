@@ -6,6 +6,8 @@ import { AssignmentEntity, BookingEntity, NotificationEntity } from 'src/models/
 import { AssignmentRepository, BookingRepository, CustomerRepository, HouseWorkerRepository, NotificationRepository } from 'src/models/repositories';
 import { FilterAdminBookingDto } from 'src/modules/admin/booking/dto/query-admin-booking.dto';
 import { NotificationGateway } from 'src/modules/notification/notification.gateway';
+import { UploadLocalService } from 'src/providers/upload/local.service';
+import { UPLOAD_PATH } from 'src/shared/constants';
 import { BOOKING_STATUS } from 'src/shared/enums/booking.enum';
 import { NOTIFICATION_TYPE } from 'src/shared/enums/notification.enum';
 import { ERROR } from 'src/shared/exceptions';
@@ -23,6 +25,7 @@ export class AssignmentService {
     private readonly assignmentRepository: AssignmentRepository,
     private readonly notificationRepository: NotificationRepository,
     private readonly notificationGateway: NotificationGateway,
+    private readonly uploadLocalService: UploadLocalService,
     private readonly databaseUtilService: DatabaseUtilService,
     private readonly dataSource: DataSource,
   ) {}
@@ -33,10 +36,23 @@ export class AssignmentService {
       listBooking = await this.bookingRepository.getListBooking(filterAdminBooking);
     } else {
       const assignment = await this.assignmentRepository.getAssignmentWithStatusByHouseWorker(houseWorkerId, filterAdminBooking);
-      listBooking = _.map(assignment, 'booking');
+      listBooking = _.map(assignment, (item) => {
+        return {
+          ...item.booking,
+          evidence: item.evidence,
+        }
+      });
     }
-    // const listBookingPendingGroupByDate = _.groupBy(listBookingPending, 'dateTime');
-    return listBooking;
+    const result = _.orderBy(listBooking, ['dateTime'], ['desc']);
+    return result;
+  }
+  
+  async getDetailAssignment(houseWorkerId: string, assignmentId: string) {
+    const assignment = await this.assignmentRepository.getAssignmentById(assignmentId);
+    if(assignment.houseWorker.id !== houseWorkerId) {
+      throw new BaseException(ERROR.ASSIGNMENT_NOT_FOUND);
+    }
+    return assignment;
   }
   
   async acceptBooking(houseWorkerId: string, bookingId: string) {
@@ -128,5 +144,23 @@ export class AssignmentService {
     await this.notificationRepository.save(newNotification);
     await this.notificationGateway.refreshNotificationCustomer(booking.address.customer.id);
     return { status: BOOKING_STATUS.COMPLETED };
+  }
+  
+  async updateEvidence(houseWorkerId: string, bookingId: string, evidence: Express.Multer.File) {
+    const booking = await this.bookingRepository.getBookingById(bookingId);
+    if(booking.status !== BOOKING_STATUS.WORKING) {
+      throw new BaseException(ERROR.BOOKING_NOT_COMPLETED);
+    }
+    if(!evidence) {
+      throw new BaseException(ERROR.EVIDENCE_REQUIRED);
+    }
+    const assignment = await this.assignmentRepository.getAssignmentByBooking(bookingId);
+    if(assignment.evidence) {
+      await this.uploadLocalService.deleteFile(assignment.evidence)
+    }
+    const evidenceImage: string = (await this.uploadLocalService.putFile(evidence, UPLOAD_PATH.IMAGE, 'evidence'))?.path
+    assignment.evidence = evidenceImage
+    const updateAssignment = await this.assignmentRepository.save(assignment);
+    return { evidence: updateAssignment.evidence };
   }
 }

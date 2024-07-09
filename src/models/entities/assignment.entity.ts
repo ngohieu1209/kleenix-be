@@ -20,6 +20,11 @@ export class AssignmentEntity extends BaseEntity {
   @Column({ name: 'end_time' })
   endTime: Date;
   
+  @Column({
+    nullable: true
+  })
+  evidence: string;
+  
   // RELATION
   // -----------------------------------------------------------------------------
 
